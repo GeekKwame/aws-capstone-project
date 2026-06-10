@@ -24,6 +24,201 @@ A team capstone project building and deploying a web application on AWS using Fr
 
 ---
 
+## Phase 2: Web Application Development & EC2 Deployment
+
+**Challenge:** Build a functional frontend application and host it on the EC2 web server.
+
+### Task 1 — Host Web App on EC2 Instance
+
+| Activity | Status |
+|----------|--------|
+| Develop the Student Study Planner frontend (HTML, CSS, JavaScript) | Done |
+| Connect to the EC2 instance via SSH | Done |
+| Install and enable Nginx on Amazon Linux 2023 | Done |
+| Upload application files to the instance via SCP | Done |
+| Deploy files to `/var/www/study-planner` and set Nginx ownership | Done |
+| Configure Nginx to serve the app and expose a health check endpoint | Done |
+| Verify the application is reachable over HTTP in a browser | Done |
+
+A simple web application called **Student Study Planner** was developed using HTML, CSS, and JavaScript. The application allows users to manage study tasks and monitor progress through an intuitive interface, demonstrating the successful development of a functional frontend application.
+
+#### Web Application
+
+The app lives in the `app/` directory and includes:
+
+| File | Purpose |
+|------|---------|
+| `index.html` | Main UI — task form, progress tracker, daily motivation |
+| `css/styles.css` | Layout, theming (light/dark), responsive styles |
+| `js/app.js` | Task CRUD, filtering, localStorage persistence |
+| `js/config.js` | S3 logo URL and app configuration |
+| `health.html` | Plain-text health check response for load balancer probes |
+
+![Student Study Planner — full application](docs/phase2/screenshots/image8.png)
+
+![Student Study Planner — task management UI](docs/phase2/screenshots/image5.png)
+
+#### SSH Connection to EC2
+
+Connected to the Capstone-WebServer instance using the team SSH key pair:
+
+```powershell
+ssh -i eddie-key.pem ec2-user@3.237.34.20
+```
+
+![SSH connection to EC2 instance](docs/phase2/screenshots/image2.png)
+
+#### Install Nginx
+
+Nginx was installed, enabled at boot, and started on Amazon Linux 2023:
+
+```bash
+sudo dnf install -y nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
+```
+
+![Nginx package installation in progress](docs/phase2/screenshots/image3.png)
+
+![Nginx installation complete](docs/phase2/screenshots/image1.png)
+
+#### Upload Application Files
+
+Application source files were copied from the local workstation to the instance using SCP:
+
+```powershell
+scp -i eddie-key.pem -r app/* ec2-user@3.237.34.20:/tmp/study-planner/
+```
+
+![SCP upload of app files to EC2](docs/phase2/screenshots/image7.png)
+
+#### Deploy to Web Root
+
+On the instance, files were moved into the Nginx document root and ownership was set for the `nginx` user:
+
+```bash
+sudo mkdir -p /var/www/study-planner
+sudo cp -r /tmp/study-planner/* /var/www/study-planner/
+sudo chown -R nginx:nginx /var/www/study-planner
+```
+
+![Deploy files to /var/www/study-planner](docs/phase2/screenshots/image9.png)
+
+#### Nginx Site Configuration
+
+A site block was created at `/etc/nginx/conf.d/study-planner.conf` to serve the SPA with a dedicated health check:
+
+```nginx
+server {
+    listen 80;
+    server_name _;
+    root /var/www/study-planner;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location = /health.html {
+        access_log off;
+        return 200 "OK\n";
+        add_header Content-Type text/plain;
+    }
+}
+```
+
+![Nginx site configuration in nano](docs/phase2/screenshots/image4.png)
+
+The configuration was validated and Nginx was reloaded:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+![Nginx config test and reload](docs/phase2/screenshots/image6.png)
+
+#### Live Verification
+
+The application is live at **http://3.237.34.20** and serves the Student Study Planner UI over HTTP (port 80).
+
+| Property | Value |
+|----------|-------|
+| Web root | `/var/www/study-planner` |
+| Nginx config | `/etc/nginx/conf.d/study-planner.conf` |
+| Public URL | `http://3.237.34.20` |
+| Health check | `http://3.237.34.20/health.html` |
+
+### Task 2 — Configure Target Group for EC2
+
+| Activity | Status |
+|----------|--------|
+| Create target group (`capstone-web-tg`) with HTTP on port 80 | Done |
+| Configure health check path (`/health.html`) | Done |
+| Review and create the target group in the AWS Console | Done |
+| Register `Capstone-WebServer` EC2 instance as a target | Done |
+
+An **Application Load Balancer Target Group** was created in the AWS Console to route traffic to the EC2 web server. The group uses the same VPC as the instance and reuses the `/health.html` endpoint from Task 1 for health checks.
+
+#### Target Group Settings
+
+| Property | Value |
+|----------|-------|
+| Name | `capstone-web-tg` |
+| Target type | Instance |
+| Protocol : Port | HTTP : 80 |
+| Protocol version | HTTP1 |
+| VPC | `vpc-00a64ca8744d9cb02` (default) |
+| IP address type | IPv4 |
+| ARN | `arn:aws:elasticloadbalancing:us-east-1:610356897914:targetgroup/capstone-web-tg/fbd644598296d872` |
+
+![Target group basic settings — name, protocol, VPC](docs/phase2/screenshots/image10.png)
+
+#### Health Check Configuration
+
+| Setting | Value |
+|---------|-------|
+| Health check protocol | HTTP |
+| Health check path | `/health.html` |
+| Health check port | traffic-port |
+| Interval | 30 seconds |
+| Timeout | 5 seconds |
+| Healthy threshold | 5 |
+| Unhealthy threshold | 2 |
+| Success codes | 200 |
+
+![Target group health check settings](docs/phase2/screenshots/image11.png)
+
+#### Review and Create
+
+Settings were reviewed on the **Review and create** page before submitting.
+
+![Target group review and create summary](docs/phase2/screenshots/image12.png)
+
+#### Target Group Created
+
+The target group is active in **us-east-1**. A load balancer is not associated yet — that will be configured in a later step.
+
+![Target group details — capstone-web-tg created](docs/phase2/screenshots/image13.png)
+
+#### Register EC2 Instance
+
+`Capstone-WebServer` was registered as a target on port **80**:
+
+| Property | Value |
+|----------|-------|
+| Instance ID | `i-039e2bea39a5ec163` |
+| Name | Capstone-WebServer |
+| Port | 80 |
+| Availability Zone | `us-east-1f` |
+| Registered targets | 1 |
+
+![EC2 instance registered to capstone-web-tg](docs/phase2/screenshots/image14.png)
+
+> **Note:** The target health status shows **Unused** because no load balancer is attached yet. AWS only runs active health checks once the target group is linked to an ALB listener. This is expected — the next step is to create the Application Load Balancer and forward traffic to `capstone-web-tg`.
+
+---
+
 ## Team
 
 ### AWS IAM Users
@@ -214,13 +409,14 @@ A test static asset (`Azubi.png`, 2.8 KB, Standard storage class) was uploaded t
 
 ## Next Steps
 
-Phase 1 establishes the foundation. Upcoming work includes:
+Phase 1 and Phase 2 Tasks 1–2 establish the foundation, a live web application, and a load balancer target group. Upcoming work includes:
 
+- Create an Application Load Balancer and attach `capstone-web-tg`
 - Request and validate an ACM certificate
-- Deploy web server software on the EC2 instance
-- Configure CloudFront and Application Load Balancer
+- Configure CloudFront
+- Enable HTTPS and custom domain routing
 - Automate infrastructure with IaC (future phases)
 
 ---
 
-*Last updated: June 10, 2026 — Phase 1 complete.*
+*Last updated: June 10, 2026 — Phase 1 complete; Phase 2 Tasks 1–2 documented.*
