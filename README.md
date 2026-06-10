@@ -26,7 +26,7 @@ A team capstone project building and deploying a web application on AWS using Fr
 
 ## Phase 2: Web Application Development & EC2 Deployment
 
-**Challenge:** Build a functional frontend application and host it on the EC2 web server.
+**Challenge:** Build a functional frontend application, host it on the EC2 web server, configure load balancing, offload static assets to S3, and set up Auto Scaling for high availability.
 
 ### Task 1 — Host Web App on EC2 Instance
 
@@ -561,14 +561,13 @@ This certificate will be attached to the CloudFront distribution and Application
 
 ## Next Steps
 
-Phase 1 and Phase 2 Tasks 1–2 establish the foundation, a live web application, and a load balancer target group. Upcoming work includes:
+Phase 1 and Phase 2 (Tasks 1–5) are now complete. The application is live behind an Application Load Balancer, static assets are served from S3, and an Auto Scaling Group is configured for high availability. Upcoming work includes:
 
-- Create an Application Load Balancer and attach `capstone-web-tg`
-- Request and validate an ACM certificate
-- Configure CloudFront
-- Enable HTTPS and custom domain routing
-- Automate infrastructure with IaC (future phases)
+- Configure CloudFront CDN distribution in front of the ALB
+- Enable HTTPS with the ACM certificate on the CloudFront distribution and ALB (HTTPS listener)
+- Configure custom domain routing via DuckDNS → CloudFront
+- Automate infrastructure with IaC — CloudFormation or Terraform (future phases)
 
 ---
 
-*Last updated: June 10, 2026 — Phase 1 complete; Phase 2 Tasks 1–2 documented.*
+*Last updated: June 10, 2026 — Phase 1 complete; Phase 2 Tasks 1–5 documented (ALB, S3 static assets, Auto Scaling Group, ACM certificate).*
