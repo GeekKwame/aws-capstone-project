@@ -215,7 +215,103 @@ The target group is active in **us-east-1**. A load balancer is not associated y
 
 ![EC2 instance registered to capstone-web-tg](docs/phase2/screenshots/image14.png)
 
-> **Note:** The target health status shows **Unused** because no load balancer is attached yet. AWS only runs active health checks once the target group is linked to an ALB listener. This is expected — the next step is to create the Application Load Balancer and forward traffic to `capstone-web-tg`.
+> **Note:** The target health status initially showed **Unused** because no load balancer was attached. Once the Application Load Balancer was associated, the active health checks started, and the instance state updated to **Healthy**.
+
+### Task 3 — Configure Application Load Balancer (ALB)
+
+| Activity | Status |
+|----------|--------|
+| Create internet-facing Application Load Balancer (`study-planner-alb`) | Done |
+| Configure listener on Port 80 (HTTP) | Done |
+| Attach default forwarding action to target group `capstone-web-tg` | Done |
+| Verify ALB DNS resolves and routes traffic to the EC2 instances | Done |
+| Test health checks and verify "Healthy" status in target group | Done |
+
+An **Application Load Balancer (ALB)** was deployed to distribute incoming traffic across the backend web server instances in multiple Availability Zones.
+
+#### Load Balancer Configuration
+
+| Property | Value |
+|----------|-------|
+| Name | `study-planner-alb` |
+| Scheme | Internet-facing |
+| IP address type | IPv4 |
+| Listener | HTTP : 80 |
+| Action | Forward to `capstone-web-tg` |
+| DNS Name | `study-planner-alb-1113325153.us-east-1.elb.amazonaws.com` |
+| VPC | `vpc-00a64ca8744d9cb02` |
+
+![Application Load Balancer Details](docs/phase2/screenshots/alb-details.png)
+
+#### Live Verification of Target Health
+
+After the ALB was created, active health probes successfully verified Nginx. The instances show a status of **Healthy**:
+
+![Target group health check verification](docs/phase2/screenshots/alb-healthy.png)
+
+---
+
+### Task 4 — Offload Static Assets to S3
+
+| Activity | Status |
+|----------|--------|
+| Sync application code and static assets to S3 bucket | Done |
+| Configure public access and CORS rules on S3 bucket | Done |
+| Update application asset configuration in `app/js/config.js` | Done |
+
+To improve performance and optimize server resource utilization, the static assets of the **Student Study Planner** are synchronized to a public S3 bucket and served directly.
+
+#### Synchronization Command
+The codebase was synchronized from the local repository to the S3 bucket using the AWS CLI:
+
+```powershell
+aws s3 sync app/ s3://capstone-static-assets-azubi-610356897914-us-east-1-an/ --profile cloud-project
+```
+
+#### S3 Bucket Settings
+
+* **Bucket Name:** `capstone-static-assets-azubi-610356897914-us-east-1-an`
+* **Static Asset Base URL:** `https://capstone-static-assets-azubi-610356897914-us-east-1-an.s3.us-east-1.amazonaws.com`
+* **Logo Asset Path:** `https://capstone-static-assets-azubi-610356897914-us-east-1-an.s3.us-east-1.amazonaws.com/Azubi.png`
+
+![S3 static assets directory structure](docs/phase2/screenshots/s3-assets.png)
+
+---
+
+### Task 5 — Configure Auto Scaling Group (ASG)
+
+| Activity | Status |
+|----------|--------|
+| Create custom AMI (`Capstone-WebServer-AMI`) from active EC2 instance | Done |
+| Create Launch Template (`capstone-web-lt`) using the custom AMI | Done |
+| Configure Auto Scaling Group (`capstone-web-asg`) | Done |
+| Link ASG to `capstone-web-tg` to automate target registration | Done |
+
+To handle traffic spikes and ensure high availability, an Auto Scaling Group was configured to scale instances dynamically between 1 and 3 web servers.
+
+#### 1. Custom Amazon Machine Image (AMI)
+To preserve all manual software configuration (Nginx installation, local static content, Nginx site block) completed in Task 1, a custom AMI was built:
+* **Image Name:** `Capstone-WebServer-AMI`
+* **AMI ID:** `ami-011769ff5f024dd25`
+
+#### 2. Launch Template Details
+* **Template Name:** `capstone-web-lt`
+* **Template ID:** `lt-017bd876a4f79d816`
+* **Instance Type:** `t3.micro` (Free-Tier eligible)
+* **Key Pair:** `eddie-key`
+* **Security Group:** `sg-04e6b787ff7ea5574` (launch-wizard-3)
+
+#### 3. Auto Scaling Group Settings
+* **ASG Name:** `capstone-web-asg`
+* **Desired Capacity:** 1 instance
+* **Minimum Size:** 1 instance
+* **Maximum Size:** 3 instances
+* **Availability Zones / Subnets:** Distributed across all 6 default subnets in `us-east-1`
+* **Health Check Type:** ELB (Grace Period: 300 seconds)
+
+![Auto Scaling Group Settings](docs/phase2/screenshots/asg-details.png)
+
+Once active, the ASG successfully launched a clone instance (`i-0a0bf40efd7d380bc`) and automatically registered it into the Load Balancer target group.
 
 ---
 
@@ -387,6 +483,62 @@ A test static asset (`Azubi.png`, 2.8 KB, Standard storage class) was uploaded t
 ![S3 static asset upload verification](docs/phase1/screenshots/image8.png)
 
 ---
+
+
+## AWS Certificate Manager (ACM) SSL/TLS Certificate
+
+### SSL/TLS Certificate Request
+
+| Property          | Value                              |
+| ----------------- | ---------------------------------- |
+| Domain Name       | `capstonestudyplanner.duckdns.org` |
+| Certificate Type  | Public Certificate                 |
+| Validation Method | DNS Validation                     |
+| AWS Service       | AWS Certificate Manager (ACM)      |
+| Region            | `us-east-1` (N. Virginia)          |
+| Status            | Issued                             |
+
+An SSL/TLS certificate was requested through AWS Certificate Manager (ACM) to enable secure HTTPS communication for the application. The certificate will be used in later phases when configuring CloudFront and Application Load Balancer HTTPS listeners.
+
+The certificate request was submitted using the custom domain:
+
+```text
+capstonestudyplanner.duckdns.org
+```
+![Duckdns custom domain](docs/phase2/screenshots/duckdns-domain.png)
+
+DNS validation was selected as the verification method. AWS ACM generated a CNAME validation record which was added to the domain's DNS configuration. Once AWS verified ownership of the domain, the certificate status changed to **Issued**.
+
+### Certificate Request
+
+The ACM wizard was used to request a public certificate for the custom domain.
+
+![ACM certificate request](docs/phase2/screenshots/request-pc-1.png)
+![ACM certificate request](docs/phase2/screenshots/request-pc-2.png)
+
+### DNS Validation
+
+AWS generated DNS validation records that were added to the domain DNS configuration to prove ownership.
+
+![DNS validation records](docs/phase1/screenshots/image15.png
+
+### Certificate Issued
+
+After successful validation, ACM issued the certificate and made it available for use with AWS services such as CloudFront, Application Load Balancer, and API Gateway.
+
+### Purpose
+
+The ACM certificate provides:
+
+* HTTPS encryption for all client connections
+* Secure communication between users and AWS services
+* Trusted SSL/TLS certificates managed automatically by AWS
+* Automatic certificate renewal without manual intervention
+* Compliance with security best practices for production workloads
+
+This certificate will be attached to the CloudFront distribution and Application Load Balancer in later project phases to enforce HTTPS access to the Student Study Planner application.
+
+
 
 ## Quick Start (New Team Member)
 
