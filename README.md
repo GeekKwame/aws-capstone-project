@@ -17,6 +17,7 @@ The **Student Study Planner** is deployed on AWS using a highly resilient, publi
 | [Phase 1](docs/phase1/README.md) | Project setup, IAM, CLI, GitHub, EC2, S3 | ✅ Complete |
 | [Phase 2](docs/phase2/README.md) | Web app deployment, ALB, S3 static assets, Auto Scaling, ACM | ✅ Complete |
 | [Phase 3](docs/phase3/README.md) | CloudFront CDN, HTTPS enforcement, custom domain via studentstudyplannerxyz.xyz | ✅ Complete |
+| [Phase 4](docs/phase4/README.md) | CI/CD Pipeline (GitHub Actions), Monitoring, Cost Management | 🔄 In Progress |
 
 ---
 
@@ -46,7 +47,10 @@ Users → studentstudyplannerxyz.xyz
 | Static Assets | AWS S3 |
 | Load Balancing | AWS Application Load Balancer |
 | Scaling | AWS Auto Scaling Group |
+| CDN | AWS CloudFront (Global Edge Network) |
 | TLS/SSL | AWS Certificate Manager (ACM) |
+| CI/CD | GitHub Actions (`appleboy/ssh-action`) |
+| Monitoring | AWS CloudWatch (Alarms & Logs) |
 | Version Control | GitHub |
 | Project Management | Trello |
 
@@ -121,12 +125,17 @@ aws-capstone-project/
 │       ├── app.js        # Task CRUD, filtering, localStorage
 │       ├── config.js     # S3 asset URLs and app config
 │       └── config.example.js # Config template for deployment setup
+├── .github/
+│   └── workflows/
+│       └── deploy.yml    # GitHub Actions CI/CD pipeline
 ├── docs/
 │   ├── phase1/           # Phase 1 documentation & screenshots
 │   │   └── README.md
 │   ├── phase2/           # Phase 2 documentation & screenshots
 │   │   └── README.md
-│   └── phase3/           # Phase 3 documentation & screenshots
+│   ├── phase3/           # Phase 3 documentation & screenshots
+│   │   └── README.md
+│   └── phase4/           # Phase 4 documentation & screenshots
 │       └── README.md
 ├── nginx/
 │   └── study-planner.conf # Nginx configuration template for EC2
@@ -144,16 +153,18 @@ aws-capstone-project/
 | [docs/phase1/README.md](docs/phase1/README.md) | IAM setup, AWS CLI, GitHub repo, Trello, EC2, S3, ACM certificate request |
 | [docs/phase2/README.md](docs/phase2/README.md) | Web app deployment, Nginx, ALB, target groups, S3 static assets, Auto Scaling |
 | [docs/phase3/README.md](docs/phase3/README.md) | CloudFront CDN, HTTPS enforcement, Custom Domain configuration, OAC setup |
+| [docs/phase4/README.md](docs/phase4/README.md) | GitHub Actions CI/CD pipeline, Git setup on EC2, CloudWatch Alarms, Budgets |
 
 ---
 
 ## Next Steps
 
-- Configure CloudFront CDN distribution in front of the ALB
-- Enable HTTPS with the ACM certificate on CloudFront and the ALB listener
-- Configure custom domain routing via studentstudyplannerxyz.xyz → CloudFront
-- Automate infrastructure with IaC — CloudFormation or Terraform (future phases)
+- Set up AWS CloudWatch Alarms for EC2 CPU and ALB 5xx error rates
+- Enable CloudWatch Logs for Nginx access/error logs with 7-day retention
+- Configure AWS Budgets alert for Free Tier cost threshold
+- Conduct peer code review via GitHub Pull Requests before final merge
+- Phase 5: Infrastructure as Code (CloudFormation or Terraform)
 
 ---
 
-*Last updated: June 10, 2026 — Phase 1 & 2 complete.*
+*Last updated: June 11, 2026 — Phase 4 in progress: CI/CD pipeline live, repo cloned on EC2.*
