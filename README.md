@@ -117,12 +117,19 @@ aws-capstone-project/
 │   ├── css/styles.css    # Styles (light/dark theme, responsive)
 │   └── js/
 │       ├── app.js        # Task CRUD, filtering, localStorage
-│       └── config.js     # S3 asset URLs and app config
+│       ├── config.js     # S3 asset URLs and app config
+│       └── config.example.js # Config template for deployment setup
 ├── docs/
 │   ├── phase1/           # Phase 1 documentation & screenshots
 │   │   └── README.md
-│   └── phase2/           # Phase 2 documentation & screenshots
+│   ├── phase2/           # Phase 2 documentation & screenshots
+│   │   └── README.md
+│   └── phase3/           # Phase 3 documentation & screenshots
 │       └── README.md
+├── nginx/
+│   └── study-planner.conf # Nginx configuration template for EC2
+├── scripts/
+│   └── generate_phase2_docx.js # Documentation compiler script
 └── README.md             # This file
 ```
 
@@ -134,6 +141,7 @@ aws-capstone-project/
 |----------|----------|
 | [docs/phase1/README.md](docs/phase1/README.md) | IAM setup, AWS CLI, GitHub repo, Trello, EC2, S3, ACM certificate request |
 | [docs/phase2/README.md](docs/phase2/README.md) | Web app deployment, Nginx, ALB, target groups, S3 static assets, Auto Scaling |
+| [docs/phase3/README.md](docs/phase3/README.md) | CloudFront CDN, HTTPS enforcement, Custom Domain configuration, OAC setup |
 
 ---
 
