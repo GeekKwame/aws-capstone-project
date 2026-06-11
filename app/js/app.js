@@ -1,258 +1,294 @@
-const QUOTES = [
-  { text: 'The secret of getting ahead is getting started.', author: 'Mark Twain' },
-  { text: 'Success is the sum of small efforts, repeated day in and day out.', author: 'Robert Collier' },
-  { text: 'It does not matter how slowly you go as long as you do not stop.', author: 'Confucius' },
-  { text: 'The future belongs to those who prepare for it today.', author: 'Malcolm X' },
-  { text: 'You don\'t have to be great to start, but you have to start to be great.', author: 'Zig Ziglar' },
-  { text: 'Study while others are sleeping; work while others are loafing.', author: 'William Arthur Ward' },
-  { text: 'Education is the passport to the future, for tomorrow belongs to those who prepare for it today.', author: 'Malcolm X' },
-  { text: 'The expert in anything was once a beginner.', author: 'Helen Hayes' },
-  { text: 'Push yourself, because no one else is going to do it for you.', author: 'Unknown' },
-  { text: 'Dream big and dare to fail.', author: 'Norman Vaughan' }
-];
+/**
+ * MyCloudApp — Main application logic
+ *
+ * Dynamically separates static asset URLs (S3/CloudFront) from
+ * dynamic application content (EC2/ALB).
+ */
 
-let tasks = [];
-let currentFilter = 'all';
+(function () {
+  "use strict";
 
-const els = {
-  root: document.documentElement,
-  themeToggle: document.getElementById('theme-toggle'),
-  logo: document.getElementById('logo'),
-  quoteText: document.getElementById('quote-text'),
-  quoteAuthor: document.getElementById('quote-author'),
-  newQuoteBtn: document.getElementById('new-quote-btn'),
-  progressBar: document.getElementById('progress-bar'),
-  progressFill: document.getElementById('progress-fill'),
-  progressPercent: document.getElementById('progress-percent'),
-  statTotal: document.getElementById('stat-total'),
-  statDone: document.getElementById('stat-done'),
-  statPending: document.getElementById('stat-pending'),
-  taskForm: document.getElementById('task-form'),
-  taskTitle: document.getElementById('task-title'),
-  taskSubject: document.getElementById('task-subject'),
-  taskPriority: document.getElementById('task-priority'),
-  taskList: document.getElementById('task-list'),
-  emptyState: document.getElementById('empty-state'),
-  clearCompletedBtn: document.getElementById('clear-completed-btn'),
-  filterBtns: document.querySelectorAll('.filter-btn')
-};
+  // ---------------------------------------------------------------------------
+  // Asset URL resolver — static assets go to S3 via CloudFront CDN
+  // ---------------------------------------------------------------------------
 
-function getSystemTheme() {
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
+  /**
+   * Build a fully-qualified URL for a static asset stored in S3.
+   * @param {string} relativePath - Path relative to the static asset prefix (e.g. "images/hero.svg")
+   * @returns {string} CDN URL pointing to the S3 object
+   */
+  function getStaticAssetUrl(relativePath) {
+    const normalized = relativePath.replace(/^\//, "");
+    return `${AppConfig.cdnDomain}${AppConfig.staticAssetPrefix}/${normalized}`;
+  }
 
-function applyTheme(theme) {
-  els.root.dataset.theme = theme;
-  els.themeToggle.setAttribute(
-    'aria-label',
-    theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'
-  );
-}
+  /**
+   * Build a URL for dynamic application resources served from EC2.
+   * @param {string} path - Application-relative path
+   * @returns {string} Same-origin URL
+   */
+  function getAppResourceUrl(path) {
+    return new URL(path, window.location.origin).href;
+  }
 
-function initTheme() {
-  const saved = localStorage.getItem(CONFIG.THEME_KEY);
-  const theme = saved === 'light' || saved === 'dark' ? saved : getSystemTheme();
-  applyTheme(theme);
-}
+  // ---------------------------------------------------------------------------
+  // Feature cards data
+  // ---------------------------------------------------------------------------
 
-function toggleTheme() {
-  const current = els.root.dataset.theme || getSystemTheme();
-  const next = current === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
-  localStorage.setItem(CONFIG.THEME_KEY, next);
-}
+  const FEATURES = [
+    {
+      icon: "🔒",
+      title: "HTTPS Secured",
+      description:
+        "TLS termination at CloudFront using an ACM certificate. All traffic is encrypted in transit from the browser to the edge.",
+      tag: "ACM + CloudFront",
+      staticIcon: "images/icon-https.svg",
+    },
+    {
+      icon: "⚖️",
+      title: "Load Balanced",
+      description:
+        "Application Load Balancer distributes traffic across healthy EC2 targets with active health checks on /health.",
+      tag: "ALB Health Checks Active",
+      staticIcon: "images/icon-alb.svg",
+    },
+    {
+      icon: "🌐",
+      title: "CDN Enabled",
+      description:
+        "Static assets are cached at 400+ CloudFront edge locations worldwide, reducing latency and origin load.",
+      tag: "Global CloudFront Edge",
+      staticIcon: "images/icon-cdn.svg",
+    },
+    {
+      icon: "🚀",
+      title: "CI/CD Live",
+      description:
+        "GitHub Actions deploys every push to main via SSH, pulling the latest code and restarting Nginx automatically.",
+      tag: "GitHub Actions Pipeline",
+      staticIcon: "images/icon-cicd.svg",
+    },
+  ];
 
-function initAssets() {
-  if (CONFIG.S3_ASSET_BASE && CONFIG.ASSETS.logo) {
-    els.logo.src = `${CONFIG.S3_ASSET_BASE}/${CONFIG.ASSETS.logo}`;
-    els.logo.onerror = () => {
-      els.logo.style.display = 'none';
+  // ---------------------------------------------------------------------------
+  // DOM rendering
+  // ---------------------------------------------------------------------------
+
+  function renderFeatureCards() {
+    const grid = document.getElementById("feature-grid");
+    if (!grid) return;
+
+    grid.innerHTML = FEATURES.map(
+      (feature) => `
+      <article class="feature-card">
+        <div class="feature-icon" aria-hidden="true">
+          <img
+            src="${getStaticAssetUrl(feature.staticIcon)}"
+            alt=""
+            width="28"
+            height="28"
+            onerror="this.replaceWith(document.createTextNode('${feature.icon}'))"
+          />
+        </div>
+        <h3>${feature.title}</h3>
+        <p>${feature.description}</p>
+        <span class="feature-tag">${feature.tag}</span>
+      </article>
+    `
+    ).join("");
+  }
+
+  function renderHeroVisual() {
+    const container = document.getElementById("hero-visual");
+    if (!container) return;
+
+    const heroImageUrl = getStaticAssetUrl("images/hero-banner.png");
+    const img = document.createElement("img");
+    img.src = heroImageUrl;
+    img.alt = "MyCloudApp cloud architecture illustration";
+    img.loading = "eager";
+    img.onerror = function () {
+      container.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:0.9rem;text-align:center;padding:2rem;">
+          <div>
+            <div style="font-size:3rem;margin-bottom:0.5rem;">☁️</div>
+            <p>Upload <code>hero-banner.png</code> to<br/>
+            <code>s3://${AppConfig.s3Bucket}${AppConfig.staticAssetPrefix}/images/</code></p>
+          </div>
+        </div>`;
     };
-  }
-}
-
-function loadTasks() {
-  try {
-    const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
-    tasks = saved ? JSON.parse(saved) : [];
-  } catch {
-    tasks = [];
-  }
-}
-
-function saveTasks() {
-  localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(tasks));
-}
-
-function generateId() {
-  return `task-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
-
-function showQuote(index) {
-  const quote = QUOTES[index ?? Math.floor(Math.random() * QUOTES.length)];
-  els.quoteText.textContent = `"${quote.text}"`;
-  els.quoteAuthor.textContent = `— ${quote.author}`;
-}
-
-function getFilteredTasks() {
-  if (currentFilter === 'active') {
-    return tasks.filter((t) => !t.completed);
-  }
-  if (currentFilter === 'completed') {
-    return tasks.filter((t) => t.completed);
-  }
-  return tasks;
-}
-
-function updateProgress() {
-  const total = tasks.length;
-  const done = tasks.filter((t) => t.completed).length;
-  const pending = total - done;
-  const percent = total === 0 ? 0 : Math.round((done / total) * 100);
-
-  els.statTotal.textContent = total;
-  els.statDone.textContent = done;
-  els.statPending.textContent = pending;
-  els.progressPercent.textContent = `${percent}% complete`;
-  els.progressFill.style.width = `${percent}%`;
-  els.progressBar.setAttribute('aria-valuenow', percent);
-
-  const hasCompleted = done > 0;
-  els.clearCompletedBtn.hidden = !hasCompleted;
-}
-
-function createTaskElement(task) {
-  const li = document.createElement('li');
-  li.className = `task-item${task.completed ? ' task-item--done' : ''}`;
-  li.dataset.id = task.id;
-
-  const checkbox = document.createElement('input');
-  checkbox.type = 'checkbox';
-  checkbox.className = 'task-item__checkbox';
-  checkbox.checked = task.completed;
-  checkbox.setAttribute('aria-label', `Mark "${task.title}" as ${task.completed ? 'incomplete' : 'complete'}`);
-  checkbox.addEventListener('change', () => toggleTask(task.id));
-
-  const content = document.createElement('div');
-  content.className = 'task-item__content';
-
-  const title = document.createElement('span');
-  title.className = 'task-item__title';
-  title.textContent = task.title;
-
-  const meta = document.createElement('div');
-  meta.className = 'task-item__meta';
-
-  const subject = document.createElement('span');
-  subject.className = 'task-item__tag';
-  subject.textContent = task.subject;
-
-  const priority = document.createElement('span');
-  priority.className = `task-item__priority task-item__priority--${task.priority}`;
-  priority.textContent = task.priority;
-
-  meta.append(subject, priority);
-  content.append(title, meta);
-
-  const deleteBtn = document.createElement('button');
-  deleteBtn.type = 'button';
-  deleteBtn.className = 'task-item__delete';
-  deleteBtn.setAttribute('aria-label', `Delete "${task.title}"`);
-  deleteBtn.textContent = '×';
-  deleteBtn.addEventListener('click', () => deleteTask(task.id));
-
-  li.append(checkbox, content, deleteBtn);
-  return li;
-}
-
-function renderTasks() {
-  const filtered = getFilteredTasks();
-  els.taskList.innerHTML = '';
-
-  filtered.forEach((task) => {
-    els.taskList.appendChild(createTaskElement(task));
-  });
-
-  const showEmpty = filtered.length === 0;
-  els.emptyState.hidden = !showEmpty;
-
-  if (showEmpty && tasks.length > 0) {
-    els.emptyState.textContent =
-      currentFilter === 'completed'
-        ? 'No completed tasks yet.'
-        : 'No active tasks. Great job — or add a new one!';
-  } else if (tasks.length === 0) {
-    els.emptyState.textContent = 'No tasks yet. Add your first study task above!';
+    container.appendChild(img);
   }
 
-  updateProgress();
-}
+  function renderRequestPath() {
+    const list = document.getElementById("request-path");
+    if (!list) return;
 
-function addTask(title, subject, priority) {
-  const task = {
-    id: generateId(),
-    title: title.trim(),
-    subject,
-    priority,
-    completed: false,
-    createdAt: new Date().toISOString()
-  };
-  tasks.unshift(task);
-  saveTasks();
-  renderTasks();
-}
+    const steps = [
+      { step: 1, label: "Client Browser initiates HTTPS request" },
+      { step: 2, label: "CloudFront edge location (TLS termination)" },
+      { step: 3, label: "Application Load Balancer (path-based routing)" },
+      { step: 4, label: "EC2 instance — Nginx serves dynamic content" },
+    ];
 
-function toggleTask(id) {
-  const task = tasks.find((t) => t.id === id);
-  if (!task) return;
-  task.completed = !task.completed;
-  saveTasks();
-  renderTasks();
-}
-
-function deleteTask(id) {
-  tasks = tasks.filter((t) => t.id !== id);
-  saveTasks();
-  renderTasks();
-}
-
-function clearCompleted() {
-  tasks = tasks.filter((t) => !t.completed);
-  saveTasks();
-  renderTasks();
-}
-
-function setFilter(filter) {
-  currentFilter = filter;
-  els.filterBtns.forEach((btn) => {
-    btn.classList.toggle('filter-btn--active', btn.dataset.filter === filter);
-  });
-  renderTasks();
-}
-
-els.taskForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const title = els.taskTitle.value.trim();
-  if (!title) {
-    els.taskTitle.focus();
-    return;
+    list.innerHTML = steps
+      .map(
+        (s) =>
+          `<li><span class="path-step">${s.step}</span>${s.label}</li>`
+      )
+      .join("");
   }
-  addTask(title, els.taskSubject.value, els.taskPriority.value);
-  els.taskForm.reset();
-  els.taskPriority.value = 'medium';
-  els.taskTitle.focus();
-});
 
-els.themeToggle.addEventListener('click', toggleTheme);
-els.newQuoteBtn.addEventListener('click', () => showQuote());
-els.clearCompletedBtn.addEventListener('click', clearCompleted);
+  function renderAssetDelivery() {
+    const list = document.getElementById("asset-delivery");
+    if (!list) return;
 
-els.filterBtns.forEach((btn) => {
-  btn.addEventListener('click', () => setFilter(btn.dataset.filter));
-});
+    const assets = [
+      { name: "Hero banner", url: getStaticAssetUrl("images/hero-banner.png") },
+      { name: "Feature icons", url: getStaticAssetUrl("images/") },
+      { name: "App shell (HTML/CSS/JS)", url: getAppResourceUrl("/") },
+    ];
 
-initTheme();
-initAssets();
-loadTasks();
-showQuote(0);
-renderTasks();
+    list.innerHTML = assets
+      .map(
+        (a) =>
+          `<li><span class="path-step">S3</span><span title="${a.url}">${a.name}</span></li>`
+      )
+      .join("");
+  }
+
+  function renderHealthStatus() {
+    const container = document.getElementById("health-status");
+    if (!container) return;
+
+    const checks = [
+      { label: "CloudFront CDN", status: "ok" },
+      { label: "ALB Target Group", status: "ok" },
+      { label: "EC2 /health endpoint", status: "ok" },
+      { label: "S3 OAC (static assets)", status: "ok" },
+    ];
+
+    container.innerHTML = checks
+      .map(
+        (c) => `
+        <div class="health-item">
+          <span class="health-label">${c.label}</span>
+          <span class="health-badge ${c.status}">${c.status === "ok" ? "Healthy" : "Check"}</span>
+        </div>`
+      )
+      .join("");
+  }
+
+  function updateDeploymentStatus() {
+    const el = document.getElementById("deployment-status");
+    if (!el) return;
+
+    const builtAt = new Date().toISOString();
+    el.textContent = `${AppConfig.appName} v${AppConfig.version} · ${AppConfig.environment} · loaded ${builtAt}`;
+  }
+
+  function updateStats() {
+    const assetsEl = document.getElementById("stat-assets");
+    if (assetsEl) {
+      assetsEl.textContent = FEATURES.length + 4;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Navigation
+  // ---------------------------------------------------------------------------
+
+  function initNavigation() {
+    const toggle = document.querySelector(".nav-toggle");
+    const navLinks = document.querySelector(".nav-links");
+    const links = document.querySelectorAll(".nav-link");
+
+    if (toggle && navLinks) {
+      toggle.addEventListener("click", () => {
+        const isOpen = navLinks.classList.toggle("open");
+        toggle.setAttribute("aria-expanded", String(isOpen));
+      });
+    }
+
+    links.forEach((link) => {
+      link.addEventListener("click", () => {
+        links.forEach((l) => l.classList.remove("active"));
+        link.classList.add("active");
+        navLinks?.classList.remove("open");
+        toggle?.setAttribute("aria-expanded", "false");
+      });
+    });
+
+    const sections = document.querySelectorAll("section[id]");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            links.forEach((l) => {
+              l.classList.toggle("active", l.getAttribute("href") === `#${id}`);
+            });
+          }
+        });
+      },
+      { rootMargin: "-40% 0px -55% 0px" }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+  }
+
+  // ---------------------------------------------------------------------------
+  // Contact form (client-side demo only)
+  // ---------------------------------------------------------------------------
+
+  function initContactForm() {
+    const form = document.getElementById("contact-form");
+    const feedback = document.getElementById("form-feedback");
+
+    if (!form) return;
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (feedback) {
+        feedback.textContent =
+          "Thank you! This demo form does not send data — wire it to your backend API in production.";
+      }
+      form.reset();
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Footer year
+  // ---------------------------------------------------------------------------
+
+  function initFooter() {
+    const yearEl = document.getElementById("year");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Bootstrap
+  // ---------------------------------------------------------------------------
+
+  function init() {
+    renderFeatureCards();
+    renderHeroVisual();
+    renderRequestPath();
+    renderAssetDelivery();
+    renderHealthStatus();
+    updateDeploymentStatus();
+    updateStats();
+    initNavigation();
+    initContactForm();
+    initFooter();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+
+  // Expose for testing / debugging
+  window.MyCloudApp = { getStaticAssetUrl, getAppResourceUrl, AppConfig };
+})();

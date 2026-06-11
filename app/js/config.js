@@ -1,12 +1,24 @@
 /**
- * App configuration — update S3_ASSET_BASE after uploading assets to your bucket.
- * Public S3 URL format: https://<bucket-name>.s3.<region>.amazonaws.com/<file-name>
+ * MyCloudApp — Runtime configuration
+ *
+ * STATIC assets (images, fonts, large files) are served from S3 via CloudFront.
+ * DYNAMIC app shell (HTML, CSS, core JS) is served from EC2 via ALB.
+ *
+ * Replace placeholder values with your actual AWS resource identifiers
+ * before deploying to production.
  */
-const CONFIG = {
-  S3_ASSET_BASE: 'https://capstone-static-assets-azubi-610356897914-us-east-1-an.s3.us-east-1.amazonaws.com',
-  ASSETS: {
-    logo: 'Azubi.png'
-  },
-  STORAGE_KEY: 'studyPlannerTasks',
-  THEME_KEY: 'studyPlannerTheme'
-};
+const AppConfig = Object.freeze({
+  // CloudFront distribution domain (e.g. d1234abcdef.cloudfront.net)
+  cdnDomain: "https://YOUR_CLOUDFRONT_DOMAIN.cloudfront.net",
+
+  // S3 bucket name (used for path construction; bucket itself is private)
+  s3Bucket: "mycloudapp-static-assets-YOUR_ACCOUNT_ID",
+
+  // Base path prefix inside the S3 bucket for static assets
+  staticAssetPrefix: "/assets",
+
+  // Application metadata
+  appName: "MyCloudApp",
+  version: "1.0.0",
+  environment: "production",
+});
