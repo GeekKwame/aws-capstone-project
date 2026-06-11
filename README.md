@@ -20,6 +20,7 @@ The **Student Study Planner** is deployed on AWS using a highly resilient, publi
 | [Phase 2](docs/phase2/README.md) | Web app deployment, ALB, S3 static assets, Auto Scaling, ACM | ✅ Complete |
 | [Phase 3](docs/phase3/README.md) | CloudFront CDN, HTTPS enforcement, custom domain via studentstudyplannerxyz.xyz | ✅ Complete |
 | [Phase 4](docs/phase4/README.md) | CI/CD Pipeline (GitHub Actions), Monitoring, Cost Management, DNS go-live | ✅ Complete |
+| [Phase 5](docs/phase5/README.md) | Intern presentation — problem statement, architecture, security, CI/CD demo, lessons learned | ✅ Complete |
 
 ---
 
@@ -162,13 +163,13 @@ aws-capstone-project/
 | [docs/phase2/README.md](docs/phase2/README.md) | Web app deployment, Nginx, ALB, target groups, S3 static assets, Auto Scaling |
 | [docs/phase3/README.md](docs/phase3/README.md) | CloudFront CDN, HTTPS enforcement, Custom Domain configuration, OAC setup |
 | [docs/phase4/README.md](docs/phase4/README.md) | GitHub Actions CI/CD pipeline, Git setup on EC2, CloudWatch Alarms, Budgets |
+| [docs/phase5/README.md](docs/phase5/README.md) | Intern presentation — problem statement, architecture walkthrough, security, CI/CD demo, Trello review, challenges, lessons learned |
 
 ---
 
-## Next Steps
+## Project Complete ✅
 
-- Conduct peer code review via GitHub Pull Requests before final merge
-- Phase 5: Infrastructure as Code (CloudFormation or Terraform)
+All five phases are documented and the application is live at [https://www.studentstudyplannerxyz.xyz/](https://www.studentstudyplannerxyz.xyz/).
 
 ---
 
