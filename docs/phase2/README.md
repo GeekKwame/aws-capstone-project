@@ -253,7 +253,7 @@ Once active, the ASG launched a clone instance (`i-0a0bf40efd7d380bc`) and autom
 
 | Property | Value |
 |----------|-------|
-| Domain Name | `capstonestudyplanner.duckdns.org` |
+| Domain Name | `studentstudyplannerxyz.xyz` |
 | Certificate Type | Public Certificate |
 | Validation Method | DNS Validation |
 | Region | `us-east-1` (N. Virginia) |
@@ -273,7 +273,7 @@ Phase 2 (Tasks 1–5) is complete. Upcoming work includes:
 
 - Configure CloudFront CDN distribution in front of the ALB
 - Enable HTTPS with the ACM certificate on the CloudFront distribution and ALB listener
-- Configure custom domain routing via DuckDNS → CloudFront
+- Configure custom domain routing via studentstudyplannerxyz.xyz → CloudFront
 - Automate infrastructure with IaC — CloudFormation or Terraform (future phases)
 
 ---

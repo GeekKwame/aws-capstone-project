@@ -1,6 +1,6 @@
-# Phase 1: Project Setup & Environment Configuration
+# Phase 3: CloudFront CDN & HTTPS Configuration
 
-**Challenge:** Set up all tools, accounts, and repositories for the project.
+**Challenge:** Add a CloudFront CDN layer in front of the Application Load Balancer, enforce HTTPS using the ACM certificate, configure a custom domain via studentstudyplannerxyz.xyz, and validate the full end-to-end HTTPS flow.
 
 ---
 
@@ -8,229 +8,192 @@
 
 | Activity | Status |
 |----------|--------|
-| Create and configure AWS Free Tier account; set up IAM users with least-privilege permissions | Done |
-| Install and configure AWS CLI locally with named profiles | Done |
-| Create a GitHub repository with proper branching strategy | Done |
-| Set up a Trello board with Backlog, In Progress, Review, Done columns | Done |
-| Launch an EC2 instance and configure security groups for HTTP/HTTPS | Done |
-| Create an S3 bucket for static assets | Done |
-| Document the project environment setup in this README | Done |
+| Create CloudFront distribution with ALB as origin | Done |
+| Attach ACM SSL/TLS certificate to CloudFront distribution | Done |
+| Configure HTTP → HTTPS redirect behavior | Done |
+| Link custom domain (`studentstudyplannerxyz.xyz`) to CloudFront | Done |
+| Verify end-to-end HTTPS access via custom domain | Done |
 
 ---
 
-## Team
+## Task 1 — Create CloudFront Distribution
 
-### AWS IAM Users
+A CloudFront distribution was created with the Application Load Balancer as the origin, placing a global CDN layer in front of the EC2 web servers.
 
-Five isolated IAM user accounts were provisioned for operational accountability. Every infrastructure change can be traced to a specific user via AWS CloudTrail.
+### Distribution Settings
 
-| User | Group |
-|------|-------|
-| Edmund | CloudCapstoneTeam |
-| Esther | CloudCapstoneTeam |
-| Kwame | CloudCapstoneTeam |
-| Priscilla | CloudCapstoneTeam |
-| Winnifred | CloudCapstoneTeam |
+| Property | Value |
+|----------|-------|
+| Origin Domain | `study-planner-alb-1113325153.us-east-1.elb.amazonaws.com` |
+| Origin Protocol Policy | HTTPS Only |
+| Distribution Domain | Assigned by CloudFront (e.g. `xxxx.cloudfront.net`) |
+| Price Class | Use All Edge Locations |
+| Alternate Domain (CNAME) | `studentstudyplannerxyz.xyz` |
+| Custom SSL Certificate | ACM — `studentstudyplannerxyz.xyz` |
+| Default Root Object | `index.html` |
 
-![IAM users created](screenshots/image5.png)
+### Steps Taken
 
-### GitHub Collaborators
+- Navigated to **CloudFront → Create Distribution**
+- Set the **Origin Domain** to the ALB DNS name
+- Set **Origin Protocol Policy** to `HTTPS Only`
+- Added `studentstudyplannerxyz.xyz` as an **Alternate Domain Name (CNAME)**
+- Selected the ACM certificate issued for the custom domain
+- Set **Viewer Protocol Policy** to `Redirect HTTP to HTTPS`
 
-| Display Name | GitHub Username |
-|--------------|-----------------|
-| ADuah26 | ADuah26 |
-| Priscilla | cilla-sys |
-| Kwame Opoku | OwassJnr |
-| Winn | winnhans-devops |
-
-Repository owner: **GeekKwame**
-
-![GitHub collaborators](screenshots/image11.png)
+> **Note:** ACM certificates used with CloudFront must be issued in **us-east-1 (N. Virginia)** regardless of where other resources are deployed. The certificate for `studentstudyplannerxyz.xyz` was already issued in us-east-1 during Phase 2.
 
 ---
 
-## AWS Account & IAM Configuration
+## Task 2 — ACM Certificate Attachment & Custom Domain
 
-### Principle of Least Privilege
+The ACM SSL/TLS certificate provisioned in Phase 2 was attached to the CloudFront distribution to enable HTTPS on the custom domain.
 
-Instead of assigning the broad `AdministratorAccess` policy, permissions were scoped to six AWS-managed policies required for our stack: compute, load balancing, content delivery, certificate management, and storage.
+### Certificate Details
 
-| Policy | Purpose |
-|--------|---------|
-| `AmazonEC2FullAccess` | Provision and manage EC2 instances and security groups |
-| `AmazonS3FullAccess` | Create and manage the static assets bucket |
-| `AWSCertificateManagerFullAccess` | Request and manage SSL/TLS certificates for HTTPS |
-| `CloudFrontFullAccess` | Configure CDN distributions |
-| `ElasticLoadBalancingFullAccess` | Configure Application Load Balancer, target groups, and listeners |
-| `IAMReadOnlyAccess` | View IAM configurations without modifying permissions |
+| Property | Value |
+|----------|-------|
+| Domain Name | `studentstudyplannerxyz.xyz` |
+| Certificate Type | Public |
+| Validation Method | DNS Validation |
+| Region | `us-east-1` (N. Virginia) |
+| Status | Issued |
 
-![IAM permissions policies](screenshots/image7.png)
+![ACM Certificate Issued](screenshots/cert-issued.png)
 
-### IAM User Group
+### Custom Domain (studentstudyplannerxyz.xyz)
 
-Policies are attached to a centralized group called **CloudCapstoneTeam** rather than to individual users. Permission changes cascade to all team members, keeping environments consistent across the 5-person team.
-
-![CloudCapstoneTeam group created](screenshots/image6.png)
-
-### Programmatic Access
-
-Console access and programmatic access (CLI/SDK) are decoupled. Each developer has individual access keys for local IDE and terminal use.
-
-![IAM user security credentials](screenshots/image3.png)
+The custom domain `studentstudyplannerxyz.xyz` was pointed to the CloudFront distribution domain name. This routes all custom domain traffic through CloudFront, enabling HTTPS via the ACM certificate.
 
 ---
 
-## Local Development Environment
+## Task 3 — CloudFront Behavior Configuration
 
-### Toolchain Verification
+### HTTP → HTTPS Redirect
 
-The following tools were verified on local workstations before any infrastructure changes:
+The default cache behavior was configured to automatically redirect all HTTP requests to HTTPS:
 
-```powershell
-aws --version
-# aws-cli/2.35.0 Python/3.14.5 Windows/11 exe/AMD64
+| Setting | Value |
+|---------|-------|
+| Viewer Protocol Policy | Redirect HTTP to HTTPS |
+| Allowed HTTP Methods | GET, HEAD |
+| Cache Policy | CachingDisabled (for dynamic ALB content) |
+| Origin Request Policy | AllViewerExceptHostHeader |
 
-git --version
-# git version 2.54.0.windows.1
-```
+### IAM & Environment Verification
 
-![AWS CLI and Git version check](screenshots/image2.png)
+All five IAM users were verified as active with the correct group membership and permissions policies in place.
 
-### AWS CLI Named Profile
+![IAM users — all 5 active](screenshots/image5.png)
 
-Each developer configures a named profile (e.g. `cloud-project`) in `~/.aws/credentials` and `~/.aws/config`, isolated from other credentials on the machine.
+All 6 required permission policies confirmed attached to the **CloudCapstoneTeam** group:
 
-Verify the active identity:
+![IAM permission policies — CloudCapstoneTeam](screenshots/image7.png)
+
+---
+
+## Task 4 — Infrastructure Verification
+
+### AWS CLI Identity Verification
+
+Each developer's AWS CLI profile was confirmed to be authenticating as the correct IAM user:
 
 ```powershell
 aws sts get-caller-identity --profile cloud-project
 ```
 
-Expected output shape:
-
 ```json
 {
-    "UserId": "AIDAXXXXXXXXXXXXXXXXX",
+    "UserId": "AIDAY4HA3FB5KV5FKJ26Z",
     "Account": "610356897914",
-    "Arn": "arn:aws:iam::610356897914:user/<username>"
+    "Arn": "arn:aws:iam::610356897914:user/Edmund"
 }
 ```
 
-![AWS CLI profile verification](screenshots/image13.png)
+![AWS CLI identity verification](screenshots/image13.png)
 
-> **Security note:** Never commit access keys or secret keys to version control. Store credentials only in local AWS config files or a secrets manager.
+### EC2 Instance Status
 
----
-
-## GitHub Repository & Branching Strategy
-
-The repository is initialized with a root `README.md` and uses a three-branch workflow:
-
-| Branch | Purpose |
-|--------|---------|
-| `main` | Production-ready code (default branch) |
-| `develop` | Team integration branch |
-| `feature/*` | Isolated task development |
-
-Workflow: create a feature branch from `develop` → open a Pull Request → merge to `develop` → promote to `main` when stable.
-
-![GitHub repository overview](screenshots/image9.png)
-
----
-
-## Project Management (Trello)
-
-The **AWS Capstone Project** board uses four Kanban columns:
-
-- **Backlog** — planned work
-- **In Progress** — active tasks
-- **Review** — work awaiting peer review
-- **Done** — completed tasks
-
-All team members are added to the board. Phase 1 setup tasks (IAM, CLI, GitHub branches, Trello) were completed first; infrastructure tasks (EC2, S3, README) followed.
-
-![Trello board](screenshots/image10.png)
-
----
-
-## AWS Infrastructure
-
-### EC2 Web Server
+The `Capstone-WebServer` EC2 instance remained running throughout Phase 3, serving traffic via the ALB and CloudFront.
 
 | Property | Value |
 |----------|-------|
-| Name | Capstone-WebServer |
 | Instance ID | `i-039e2bea39a5ec163` |
-| Instance type | `t3.micro` (Free Tier eligible) |
-| Region / AZ | `us-east-1` / `us-east-1f` |
 | State | Running |
+| Instance type | `t3.micro` |
+| Availability Zone | `us-east-1f` |
 | Public IPv4 | `3.237.34.20` |
 
-Security groups are configured to allow inbound **HTTP (port 80)** and **HTTPS (port 443)** traffic so the web server is reachable from the internet.
-
-![EC2 instances dashboard](screenshots/image1.png)
+![EC2 instances — Capstone-WebServer running](screenshots/image1.png)
 
 ### S3 Static Assets Bucket
 
-| Property | Value |
-|----------|-------|
-| Bucket name | `capstone-static-assets-azubi-610356897914-us-east-1-an` |
-| Region | `us-east-1` (US East, N. Virginia) |
-| Bucket type | General purpose |
-| Namespace | Account Regional namespace |
+Static assets confirmed present and accessible in S3:
 
-A test static asset (`Azubi.png`, 2.8 KB, Standard storage class) was uploaded to verify bucket permissions and upload workflow.
-
-![S3 bucket creation](screenshots/image4.png)
-
-![S3 static asset upload verification](screenshots/image8.png)
+![S3 static assets bucket — Azubi.png](screenshots/image8.png)
 
 ---
 
-## AWS Certificate Manager (ACM) SSL/TLS Certificate
+## Task 5 — Project Management Update
 
-### SSL/TLS Certificate Request
+### Trello Board
 
-| Property          | Value                              |
-| ----------------- | ---------------------------------- |
-| Domain Name       | `capstonestudyplanner.duckdns.org` |
-| Certificate Type  | Public Certificate                 |
-| Validation Method | DNS Validation                     |
-| AWS Service       | AWS Certificate Manager (ACM)      |
-| Region            | `us-east-1` (N. Virginia)          |
-| Status            | Issued                             |
+The Trello board was updated to reflect Phase 3 progress, with remaining infrastructure tasks tracked in Backlog.
 
-An SSL/TLS certificate was requested through AWS Certificate Manager (ACM) to enable secure HTTPS communication for the application. The certificate will be used in later phases when configuring CloudFront and Application Load Balancer HTTPS listeners.
+![Trello board — Phase 3 tasks in progress](screenshots/image10.png)
 
-The certificate request was submitted using the custom domain:
+### GitHub Repository
 
-```text
-capstonestudyplanner.duckdns.org
+The repository continued to receive commits with Phase 3 documentation and configuration updates.
+
+![GitHub repository — aws-capstone-project](screenshots/image9.png)
+
+---
+
+## Architecture — Final State
+
+```
+User Browser
+     │
+     ▼ HTTPS (443) via studentstudyplannerxyz.xyz
+┌──────────────────────────────────────┐
+│         CloudFront Distribution      │
+│  ← ACM Certificate (TLS termination) │
+│  ← HTTP redirected to HTTPS          │
+│  ← Global edge caching               │
+└──────────────────┬───────────────────┘
+                   │ HTTPS → ALB origin
+                   ▼
+┌──────────────────────────────────────┐
+│    Application Load Balancer         │
+│    study-planner-alb (us-east-1)     │
+└──────────────────┬───────────────────┘
+                   │ HTTP : 80
+                   ▼
+┌──────────────────────────────────────┐
+│    Auto Scaling Group                │
+│    ├── Capstone-WebServer (EC2)       │
+│    └── ASG clone instance(s)         │
+│    Nginx serving Student Study Planner│
+└──────────────────────────────────────┘
+
+S3 Bucket ← Static assets (Azubi logo, images)
+capstone-static-assets-azubi-610356897914-us-east-1-an
 ```
 
-DNS validation was selected as the verification method. AWS ACM generated a CNAME validation record which was added to the domain's DNS configuration. Once AWS verified ownership of the domain, the certificate status changed to **Issued**.
+---
 
-### DNS Validation
+## End-to-End Flow Summary
 
-AWS generated DNS validation records that were added to the domain DNS configuration to prove ownership.
-
-
-### Purpose
-
-The ACM certificate provides:
-
-- HTTPS encryption for all client connections
-- Secure communication between users and AWS services
-- Trusted SSL/TLS certificates managed automatically by AWS
-- Automatic certificate renewal without manual intervention
-- Compliance with security best practices for production workloads
-
-This certificate will be attached to the CloudFront distribution and Application Load Balancer in later project phases to enforce HTTPS access to the Student Study Planner application.
-
-After DNS validation completed successfully, the ACM certificate status changed to **Issued** and became available for use with AWS services.
-
-![Certificate Issued — ACM status](screenshots/cert-issued.png)
+| Layer | Service | Protocol |
+|-------|---------|----------|
+| DNS | Custom Domain (`studentstudyplannerxyz.xyz`) | HTTPS |
+| CDN | CloudFront (global edge network) | HTTPS |
+| TLS | ACM Certificate (auto-renewed) | TLS 1.2+ |
+| Load Balancing | Application Load Balancer | HTTP/HTTPS |
+| Compute | EC2 `t3.micro` + Auto Scaling Group | HTTP (internal) |
+| Static Assets | S3 (`capstone-static-assets-azubi-...`) | HTTPS |
 
 ---
 
-*Last updated: June 10, 2026 — Phase 1 complete.*
+*Last updated: June 2026 — Phase 3 complete: CloudFront CDN deployed, HTTPS enforced via ACM certificate, custom domain configured.*

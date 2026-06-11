@@ -14,13 +14,14 @@ The **Student Study Planner** is a frontend web application (HTML, CSS, JavaScri
 |-------|-------|--------|
 | [Phase 1](docs/phase1/README.md) | Project setup, IAM, CLI, GitHub, EC2, S3 | ✅ Complete |
 | [Phase 2](docs/phase2/README.md) | Web app deployment, ALB, S3 static assets, Auto Scaling, ACM | ✅ Complete |
+| [Phase 3](docs/phase3/README.md) | CloudFront CDN, HTTPS enforcement, custom domain via studentstudyplannerxyz.xyz | ✅ Complete |
 
 ---
 
 ## Architecture
 
 ```
-Users → DuckDNS (capstonestudyplanner.duckdns.org)
+Users → studentstudyplannerxyz.xyz
           ↓
     Application Load Balancer (study-planner-alb)
           ↓
@@ -140,7 +141,7 @@ aws-capstone-project/
 
 - Configure CloudFront CDN distribution in front of the ALB
 - Enable HTTPS with the ACM certificate on CloudFront and the ALB listener
-- Configure custom domain routing via DuckDNS → CloudFront
+- Configure custom domain routing via studentstudyplannerxyz.xyz → CloudFront
 - Automate infrastructure with IaC — CloudFormation or Terraform (future phases)
 
 ---

@@ -193,7 +193,7 @@ A test static asset (`Azubi.png`, 2.8 KB, Standard storage class) was uploaded t
 
 | Property          | Value                              |
 | ----------------- | ---------------------------------- |
-| Domain Name       | `capstonestudyplanner.duckdns.org` |
+| Domain Name       | `studentstudyplannerxyz.xyz`       |
 | Certificate Type  | Public Certificate                 |
 | Validation Method | DNS Validation                     |
 | AWS Service       | AWS Certificate Manager (ACM)      |
@@ -205,7 +205,7 @@ An SSL/TLS certificate was requested through AWS Certificate Manager (ACM) to en
 The certificate request was submitted using the custom domain:
 
 ```text
-capstonestudyplanner.duckdns.org
+studentstudyplannerxyz.xyz
 ```
 
 DNS validation was selected as the verification method. AWS ACM generated a CNAME validation record which was added to the domain's DNS configuration. Once AWS verified ownership of the domain, the certificate status changed to **Issued**.
