@@ -12,8 +12,8 @@
 | Install Git on EC2 instance and clone repository | ✅ Done |
 | Set up deployment script that SSHs into EC2, pulls latest code, and reloads Nginx | ✅ Done |
 | Configure CloudWatch Alarms (EC2 CPU > 80%, ALB 5xx error rate > 5%) | ✅ Done |
-| Enable CloudWatch Logs for the web application with 7-day retention | ⏳ Pending |
-| Set up AWS Budgets alert for Free Tier cost threshold | ⏳ Pending |
+| Enable CloudWatch Logs for the web application with 7-day retention | ✅ Done |
+| Set up AWS Budgets alert for Free Tier cost threshold | ✅ Done |
 | Update Trello board to reflect Phase 4 progress | ⏳ Pending |
 | Write final deployment checklist and update project README | ⏳ Pending |
 | Conduct peer code review via GitHub Pull Requests before final merge | ⏳ Pending |
@@ -164,6 +164,20 @@ This alarm monitors the CPU utilization of the active web server instance to det
 5. Under **Notification**, created a new SNS topic named `ec2-cpu-alert` and added the email address.
 6. Clicked **Create alarm** and verified the email subscription confirmation link sent by AWS.
 
+#### Configuration & Verification Screenshots:
+
+![Selecting CPUUtilization Metric](screenshots/cloudwatch-alarm-1.png)
+*Figure: Selecting the CPUUtilization metric for the target EC2 instance.*
+
+![Defining Alarm Threshold Conditions](screenshots/cloudwatch-alarm-2.png)
+*Figure: Setting the threshold to >80% for 3 consecutive periods of 5 minutes.*
+
+![Configuring SNS Notifications](screenshots/cloudwatch-alarm-3.png)
+*Figure: Configuring email notifications via SNS topic.*
+
+![Alarm Successfully Created in CloudWatch](screenshots/cloudwatch-alarm-4.png)
+*Figure: Alarm created successfully and listed in the CloudWatch Alarms dashboard.*
+
 ---
 
 ### 2. Application Load Balancer 5xx Error Alarm (`ALB-High-5XX`)
@@ -186,19 +200,120 @@ This alarm monitors the percentage of HTTP 5xx responses returned by the ALB to 
 6. Configured the action to send alerts to the existing SNS topic (`ec2-cpu-alert`).
 7. Named the alarm `ALB-High-5XX` and created it.
 
+#### Configuration Screenshot:
+
+![ALB 5xx Percentage Math Expression Alarm Setup](screenshots/elb-alarm.png)
+*Figure: Math expression setup for calculating ALB 5xx error percentage and threshold setting.*
+
 ---
 
-## Upcoming Tasks
+## Task 4 — CloudWatch Logs Agent
 
-### Task 4 — CloudWatch Logs
+The Amazon CloudWatch Logs Agent was installed and configured on the EC2 instance to stream application logs to AWS CloudWatch with a 7-day retention policy.
 
-- Enable CloudWatch Logs Agent on EC2
-- Stream Nginx access and error logs to CloudWatch Log Group
-- Set log retention policy to **7 days**
+### Installation
 
-### Task 5 — AWS Budgets
+The agent was installed directly on the EC2 instance via SSH using the Amazon Linux `yum` package manager:
 
-- Create a monthly budget alert for **$0 (Free Tier)** with email notification to the team lead when forecast exceeds threshold
+```bash
+sudo yum install amazon-cloudwatch-agent -y
+```
+
+![CloudWatch Agent Installation on EC2](screenshots/cloudwatch-agent-install.png)
+*Figure: CloudWatch Agent installed successfully on the EC2 instance (version 1.300066.2-2).*
+
+### Configuration
+
+A JSON configuration file was created at `/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json` to define which log files to collect, the CloudWatch Log Group name, the log stream name, and the retention period:
+
+```json
+{
+  "logs": {
+    "logs_collected": {
+      "files": {
+        "collect_list": [
+          {
+            "file_path": "/var/log/nginx/access.log",
+            "log_group_name": "study-planner-nginx",
+            "log_stream_name": "{instance_id}",
+            "retention_in_days": 7
+          },
+          {
+            "file_path": "/var/log/nginx/error.log",
+            "log_group_name": "study-planner-nginx-errors",
+            "log_stream_name": "{instance_id}",
+            "retention_in_days": 7
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+![CloudWatch Agent JSON Configuration](screenshots/cloudwatch-agent-config.png)
+*Figure: Agent configuration file open in nano showing log paths, log group name, log stream name, and 7-day retention.*
+
+### Starting the Agent
+
+The agent was started using the `amazon-cloudwatch-agent-ctl` command, which validated the configuration and launched the service:
+
+```bash
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+  -a fetch-config -m ec2 \
+  -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+```
+
+![CloudWatch Agent Started Successfully](screenshots/cloudwatch-agent-started.png)
+*Figure: Configuration validation succeeded and the CloudWatch Agent service started, with a systemd symlink created for auto-start on reboot.*
+
+### Configuration Summary
+
+| Property | Value |
+|----------|-------|
+| Log Group (access logs) | `study-planner-nginx` |
+| Log Group (error logs) | `study-planner-nginx-errors` |
+| Log Stream | `{instance_id}` (auto-resolved) |
+| Retention | **7 days** |
+| Config Path | `/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json` |
+
+---
+
+## Task 5 — AWS Budgets
+
+An AWS Budget alert was created to monitor monthly spending and send an email notification the moment any cost above **$0.01** is incurred, protecting the team from unexpected Free Tier overages.
+
+### Configuration Steps
+
+1. Navigated to **AWS Console → Billing → Budgets → Create budget**.
+2. Selected the **Zero spend budget** template (triggers alert on any spend above $0.01).
+3. Named the budget **`Free-Tier-Monitor`**.
+4. Added the team lead email address as a recipient.
+5. Clicked **Create budget**.
+
+![AWS Budget Configuration — Zero Spend Template](screenshots/aws-budget-create.png)
+*Figure: Configuring the Zero spend budget template named "Free-Tier-Monitor" in AWS Billing & Cost Management.*
+
+### Verification
+
+The budget was created successfully and appeared in the AWS Budgets dashboard with a **Healthy** status and **0.00% usage**.
+
+![AWS Budget Created Successfully](screenshots/aws-budget-created.png)
+*Figure: Free-Tier-Monitor budget active in the Budgets dashboard — Status: Healthy, Budget: $1.00 threshold, Amount used: $0.*
+
+### Budget Summary
+
+| Property | Value |
+|----------|-------|
+| Budget Name | `Free-Tier-Monitor` |
+| Budget Type | Zero spend budget |
+| Alert Threshold | Any spend > $0.01 |
+| Notification | Email to team lead |
+| Status | ✅ Active & Healthy |
+
+---
+
+## Remaining Tasks
 
 ### Task 6 — Trello & Peer Review
 
@@ -207,4 +322,4 @@ This alarm monitors the percentage of HTTP 5xx responses returned by the ALB to 
 
 ---
 
-*Last updated: June 11, 2026 — Phase 4 in progress: CI/CD pipeline configured, secrets added, EC2 cloned, and CloudWatch Alarms setup documented.*
+*Last updated: June 11, 2026 — Phase 4 in progress: CI/CD pipeline live, CloudWatch Alarms configured, CloudWatch Logs Agent deployed, AWS Budget alert active.*

@@ -159,8 +159,6 @@ aws-capstone-project/
 
 ## Next Steps
 
-- Enable CloudWatch Logs for Nginx access/error logs with 7-day retention
-- Configure AWS Budgets alert for Free Tier cost threshold
 - Conduct peer code review via GitHub Pull Requests before final merge
 - Phase 5: Infrastructure as Code (CloudFormation or Terraform)
 
