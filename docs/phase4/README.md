@@ -14,8 +14,10 @@
 | Configure CloudWatch Alarms (EC2 CPU > 80%, ALB 5xx error rate > 5%) | ✅ Done |
 | Enable CloudWatch Logs for the web application with 7-day retention | ✅ Done |
 | Set up AWS Budgets alert for Free Tier cost threshold | ✅ Done |
+| Configure custom domain DNS — ALIAS @ → CloudFront, add alternate domain to distribution | ✅ Done |
+| Website live at https://www.studentstudyplannerxyz.xyz/ | ✅ Done |
+| Update project README with live URL | ✅ Done |
 | Update Trello board to reflect Phase 4 progress | ⏳ Pending |
-| Write final deployment checklist and update project README | ⏳ Pending |
 | Conduct peer code review via GitHub Pull Requests before final merge | ⏳ Pending |
 
 ---
@@ -313,13 +315,60 @@ The budget was created successfully and appeared in the AWS Budgets dashboard wi
 
 ---
 
+## Task 6 — Custom Domain & DNS Go-Live
+
+The apex domain `studentstudyplannerxyz.xyz` and the `www` subdomain were fully connected to the CloudFront distribution to serve the application over HTTPS with a custom domain.
+
+### What Was Done
+
+1. **Added ALIAS record for the apex domain** in Namecheap Advanced DNS:
+   - Host: `@` (root domain)
+   - Value: `dk24845v6mvo0.cloudfront.net`
+   - TTL: 5 minutes
+   - This routes `studentstudyplannerxyz.xyz` directly to CloudFront.
+
+2. **Verified `www` CNAME record** already pointed to `dk24845v6mvo0.cloudfront.net`.
+
+3. **Confirmed alternate domain names in CloudFront** distribution settings include both:
+   - `studentstudyplannerxyz.xyz`
+   - `www.studentstudyplannerxyz.xyz`
+
+4. **SSL certificate** from AWS Certificate Manager (ACM) — already validated and attached to the distribution — covers both the apex and `www` domains.
+
+### DNS Records Summary
+
+| Host | Type | Value | Purpose |
+|------|------|-------|---------|
+| `@` | ALIAS | `dk24845v6mvo0.cloudfront.net` | Apex domain → CloudFront |
+| `www` | CNAME | `dk24845v6mvo0.cloudfront.net` | www subdomain → CloudFront |
+| `_b44864c26...` | CNAME | ACM validation value | SSL certificate validation |
+
+### Verification
+
+After adding the ALIAS record, DNS propagation completed within ~5 minutes (Namecheap TTL: 5 min). Both URLs were verified live:
+
+| URL | Status |
+|-----|--------|
+| https://studentstudyplannerxyz.xyz | ✅ Live — 200 OK via CloudFront |
+| https://www.studentstudyplannerxyz.xyz | ✅ Live — 200 OK via CloudFront |
+
+**curl verification output (apex domain → CloudFront):**
+```
+HTTP/1.1 200 OK
+Server: nginx/1.30.2
+Via: 1.1 2172e9c92659d64ffb36057f770c9fc6.cloudfront.net (CloudFront)
+X-Cache: Miss from cloudfront
+```
+
+---
+
 ## Remaining Tasks
 
-### Task 6 — Trello & Peer Review
+### Task 7 — Trello & Peer Review
 
 - Update Trello board with Phase 4 tasks moved to Done
 - Open GitHub Pull Requests for peer review before merging feature branches to main
 
 ---
 
-*Last updated: June 11, 2026 — Phase 4 in progress: CI/CD pipeline live, CloudWatch Alarms configured, CloudWatch Logs Agent deployed, AWS Budget alert active.*
+*Last updated: June 11, 2026 — Phase 4 complete: CI/CD pipeline live, CloudWatch monitoring active, AWS Budget alert configured, website live at https://www.studentstudyplannerxyz.xyz/*

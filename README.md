@@ -4,6 +4,8 @@
 
 This repository documents the full design, provisioning, deployment, and security hardening of the application's production infrastructure on AWS. The system utilizes a load-balanced, auto-scaling architecture fronted by a global content delivery network (CDN).
 
+**Live URL:** 🌐 **[https://www.studentstudyplannerxyz.xyz/](https://www.studentstudyplannerxyz.xyz/)**
+
 **Repository:** [GeekKwame/aws-capstone-project](https://github.com/GeekKwame/aws-capstone-project)
 
 ---
@@ -17,22 +19,28 @@ The **Student Study Planner** is deployed on AWS using a highly resilient, publi
 | [Phase 1](docs/phase1/README.md) | Project setup, IAM, CLI, GitHub, EC2, S3 | ✅ Complete |
 | [Phase 2](docs/phase2/README.md) | Web app deployment, ALB, S3 static assets, Auto Scaling, ACM | ✅ Complete |
 | [Phase 3](docs/phase3/README.md) | CloudFront CDN, HTTPS enforcement, custom domain via studentstudyplannerxyz.xyz | ✅ Complete |
-| [Phase 4](docs/phase4/README.md) | CI/CD Pipeline (GitHub Actions), Monitoring, Cost Management | 🔄 In Progress |
+| [Phase 4](docs/phase4/README.md) | CI/CD Pipeline (GitHub Actions), Monitoring, Cost Management, DNS go-live | ✅ Complete |
 
 ---
 
 ## Architecture
 
 ```
-Users → studentstudyplannerxyz.xyz
+Users → https://www.studentstudyplannerxyz.xyz/
           ↓
-    Application Load Balancer (study-planner-alb)
+    Amazon Route 53 / Namecheap DNS
+    (ALIAS @ + CNAME www → CloudFront)
           ↓
-    Auto Scaling Group (capstone-web-asg)
-    ├── EC2: Capstone-WebServer (Nginx, Amazon Linux 2023)
-    └── EC2: ASG clone instance(s)
+    AWS CloudFront (dk24845v6mvo0.cloudfront.net)
+    (HTTPS enforcement, ACM SSL, Edge caching)
           ↓
-    S3 Bucket (static assets — logo, images)
+     Application Load Balancer (study-planner-alb)
+          ↓
+     Auto Scaling Group (capstone-web-asg)
+     ├── EC2: Capstone-WebServer (Nginx, Amazon Linux 2023)
+     └── EC2: ASG clone instance(s)
+          ↓
+     S3 Bucket (static assets — logo, images)
 ```
 
 ---
@@ -164,4 +172,4 @@ aws-capstone-project/
 
 ---
 
-*Last updated: June 11, 2026 — Phase 4 in progress: CI/CD pipeline live, repo cloned on EC2.*
+*Last updated: June 11, 2026 — All phases complete. Website live at [https://www.studentstudyplannerxyz.xyz/](https://www.studentstudyplannerxyz.xyz/)*
