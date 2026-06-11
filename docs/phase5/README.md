@@ -315,6 +315,9 @@ Every card across all five phases has been moved to the **Done** column. The boa
 
 ## Architecture Diagram (Final State — All Phases)
 
+![Capstone Project Architecture Diagram](architecture-diagram.png)
+
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                        INTERNET                                 │
