@@ -159,7 +159,6 @@ aws-capstone-project/
 
 ## Next Steps
 
-- Set up AWS CloudWatch Alarms for EC2 CPU and ALB 5xx error rates
 - Enable CloudWatch Logs for Nginx access/error logs with 7-day retention
 - Configure AWS Budgets alert for Free Tier cost threshold
 - Conduct peer code review via GitHub Pull Requests before final merge
