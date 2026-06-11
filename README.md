@@ -1,6 +1,8 @@
-# AWS Capstone Project
+# Student Study Planner — AWS Capstone Project
 
-A team capstone project building and deploying a web application on AWS using Free Tier resources. This repository documents our environment setup, infrastructure, and development workflow for a **Student Study Planner** application.
+**Student Study Planner** (deployed as **MyCloudApp**) is an interactive, responsive web application designed to help students organize academic workflows, manage schedules, and stay productive. It provides comprehensive task tracking (CRUD), session categorization, local progress state persistence, and interactive motivation features.
+
+This repository documents the full design, provisioning, deployment, and security hardening of the application's production infrastructure on AWS. The system utilizes a load-balanced, auto-scaling architecture fronted by a global content delivery network (CDN).
 
 **Repository:** [GeekKwame/aws-capstone-project](https://github.com/GeekKwame/aws-capstone-project)
 
@@ -8,7 +10,7 @@ A team capstone project building and deploying a web application on AWS using Fr
 
 ## Project Overview
 
-The **Student Study Planner** is a frontend web application (HTML, CSS, JavaScript) hosted on AWS infrastructure. The project demonstrates a production-grade deployment using core AWS services — EC2, S3, Application Load Balancer, and Auto Scaling.
+The **Student Study Planner** is deployed on AWS using a highly resilient, public-facing architecture. By separating static asset delivery (served from Amazon S3 via Amazon CloudFront Edge locations with Origin Access Control) from dynamic web content (served via Nginx on Amazon EC2 instances behind an Application Load Balancer), the application achieves exceptional responsiveness, security, and high availability.
 
 | Phase | Focus | Status |
 |-------|-------|--------|
