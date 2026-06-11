@@ -17,8 +17,8 @@
 | Configure custom domain DNS — ALIAS @ → CloudFront, add alternate domain to distribution | ✅ Done |
 | Website live at https://www.studentstudyplannerxyz.xyz/ | ✅ Done |
 | Update project README with live URL | ✅ Done |
-| Update Trello board to reflect Phase 4 progress | ⏳ Pending |
-| Conduct peer code review via GitHub Pull Requests before final merge | ⏳ Pending |
+| Update Trello board to reflect Phase 4 progress | ✅ Done |
+| Conduct peer code review via GitHub Pull Requests before final merge | ✅ Done |
 
 ---
 
@@ -362,12 +362,12 @@ X-Cache: Miss from cloudfront
 
 ---
 
-## Remaining Tasks
+## Phase 4 Complete ✅
 
-### Task 7 — Trello & Peer Review
+All tasks for Phase 4 have been completed:
 
-- Update Trello board with Phase 4 tasks moved to Done
-- Open GitHub Pull Requests for peer review before merging feature branches to main
+- Trello board updated with Phase 4 tasks moved to Done
+- GitHub Pull Request opened and peer code review conducted before final merge
 
 ---
 

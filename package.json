@@ -2,5 +2,9 @@
   "devDependencies": {
     "html-to-docx": "^1.8.0",
     "marked": "^18.0.5"
+  },
+  "dependencies": {
+    "docx": "^9.7.1",
+    "sharp": "^0.35.1"
   }
 }
