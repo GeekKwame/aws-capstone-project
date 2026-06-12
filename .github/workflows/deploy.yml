@@ -19,10 +19,5 @@ jobs:
             set -e
             cd /home/ec2-user/aws-capstone-project
             git pull origin main
-            sudo cp -r app/* /var/www/study-planner/
-            sudo cp nginx/study-planner.conf /etc/nginx/conf.d/study-planner.conf
-            sudo chown -R nginx:nginx /var/www/study-planner
-            sudo nginx -t
-            sudo systemctl reload nginx
-            echo "Deployment complete — Study Planner synced to /var/www/study-planner"
+            bash scripts/deploy-ec2.sh
             
