@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 async function main() {
-  console.log('Generating PowerPoint presentation slides...');
+  console.log('Generating PowerPoint presentation slides (10x5.625 coordinate layout)...');
   const pptx = new PptxGenJS();
   
   // Slide settings (16:9 widescreen)
@@ -42,10 +42,10 @@ async function main() {
     slide.addText(title, {
       x: 0.8,
       y: 0.4,
-      w: 11.5,
-      h: 0.7,
+      w: 8.4,
+      h: 0.6,
       fontFace: 'Segoe UI',
-      fontSize: 28,
+      fontSize: 24,
       color: COLORS.NAVY,
       bold: true,
       valign: 'middle'
@@ -54,9 +54,9 @@ async function main() {
     // Add decorative accent line below title
     slide.addShape('rect', {
       x: 0.8,
-      y: 1.15,
+      y: 1.0,
       w: 1.5,
-      h: 0.05,
+      h: 0.04,
       fill: { color: COLORS.SKY },
       line: { width: 0 }
     });
@@ -64,22 +64,22 @@ async function main() {
     // Add slide footer
     slide.addText('AWS DevOps Capstone Project  |  Student Study Planner', {
       x: 0.8,
-      y: 7.0,
+      y: 5.15,
       w: 7.0,
       h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 9,
+      fontSize: 8.5,
       color: '94A3B8'
     });
     
     // Page number (automatic)
     slide.addText('{slide_num} / {slide_num}', {
-      x: 11.5,
-      y: 7.0,
+      x: 8.2,
+      y: 5.15,
       w: 1.0,
       h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 9,
+      fontSize: 8.5,
       color: '94A3B8',
       align: 'right'
     });
@@ -96,12 +96,12 @@ async function main() {
     
     // Add Title
     slide.addText('STUDENT STUDY PLANNER', {
-      x: 1.0,
-      y: 1.8,
-      w: 11.33,
-      h: 1.0,
+      x: 0.5,
+      y: 1.1,
+      w: 9.0,
+      h: 0.7,
       fontFace: 'Segoe UI',
-      fontSize: 40,
+      fontSize: 32,
       color: COLORS.SKY,
       bold: true,
       align: 'center'
@@ -109,23 +109,23 @@ async function main() {
     
     // Add Subtitle
     slide.addText('AWS Cloud Infrastructure & CI/CD Deployment Showcase', {
-      x: 1.0,
-      y: 2.8,
-      w: 11.33,
-      h: 0.6,
+      x: 0.5,
+      y: 1.8,
+      w: 9.0,
+      h: 0.5,
       fontFace: 'Segoe UI',
-      fontSize: 20,
+      fontSize: 16,
       color: COLORS.WHITE,
       align: 'center'
     });
 
     slide.addText('DevOps Capstone Project Presentation — Phase 5', {
-      x: 1.0,
-      y: 3.5,
-      w: 11.33,
-      h: 0.4,
+      x: 0.5,
+      y: 2.3,
+      w: 9.0,
+      h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 14,
+      fontSize: 11,
       color: '94A3B8',
       italic: true,
       align: 'center'
@@ -133,18 +133,18 @@ async function main() {
 
     // Team members heading
     slide.addText('Azubi Africa Capstone Team:', {
-      x: 1.0,
-      y: 4.4,
-      w: 11.33,
+      x: 0.5,
+      y: 3.1,
+      w: 9.0,
       h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 12,
+      fontSize: 10,
       color: '94A3B8',
       bold: true,
       align: 'center'
     });
 
-    // Team members row
+    // Team members row (5 members)
     const members = [
       { name: 'Edmund (GeekKwame)', role: 'Infrastructure Lead' },
       { name: 'Kwame Opoku', role: 'DevOps Engineer' },
@@ -153,10 +153,10 @@ async function main() {
       { name: 'Esther', role: 'DevOps Engineer' }
     ];
 
-    const boxW = 2.0;
-    const boxH = 1.1;
-    const gap = 0.25;
-    const startX = (13.33 - (5 * boxW + 4 * gap)) / 2;
+    const boxW = 1.6;
+    const boxH = 0.95;
+    const gap = 0.15;
+    const startX = (10.0 - (5 * boxW + 4 * gap)) / 2;
 
     members.forEach((m, idx) => {
       const x = startX + idx * (boxW + gap);
@@ -164,7 +164,7 @@ async function main() {
       // Box background
       slide.addShape('rect', {
         x: x,
-        y: 4.8,
+        y: 3.5,
         w: boxW,
         h: boxH,
         fill: { color: COLORS.SLATE_CARD },
@@ -174,11 +174,11 @@ async function main() {
       // Name
       slide.addText(m.name, {
         x: x,
-        y: 4.9,
+        y: 3.55,
         w: boxW,
-        h: 0.4,
+        h: 0.35,
         fontFace: 'Segoe UI',
-        fontSize: 11,
+        fontSize: 9,
         color: COLORS.WHITE,
         bold: true,
         align: 'center'
@@ -187,11 +187,11 @@ async function main() {
       // Role
       slide.addText(m.role, {
         x: x,
-        y: 5.3,
+        y: 3.95,
         w: boxW,
-        h: 0.4,
+        h: 0.35,
         fontFace: 'Segoe UI',
-        fontSize: 9,
+        fontSize: 8,
         color: COLORS.SKY,
         align: 'center'
       });
@@ -207,26 +207,26 @@ async function main() {
     // Left column: Problem
     slide.addShape('rect', {
       x: 0.8,
-      y: 1.5,
-      w: 5.6,
-      h: 5.0,
+      y: 1.3,
+      w: 4.0,
+      h: 3.6,
       fill: { color: COLORS.RED_BG },
       line: { color: COLORS.RED_BORDER, width: 1 }
     });
     
     slide.addText('THE ACADEMIC PROBLEM', {
-      x: 1.1,
-      y: 1.7,
-      w: 5.0,
-      h: 0.4,
+      x: 1.0,
+      y: 1.45,
+      w: 3.6,
+      h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 18,
+      fontSize: 14,
       color: COLORS.RED_TEXT,
       bold: true
     });
 
     const problemPoints = [
-      'Academic Overload: Students struggle to organize tasks, courses, and deadlines across multiple subjects.',
+      'Academic Overload: Students juggle multiple courses, assignments, and study tasks without structured pathways.',
       'Generic Tool Deficit: Existing general-purpose productivity apps lack academic context (priorities, subject tags).',
       'High Friction & Loss: Paper planners are easily lost; heavyweight digital tools have steep learning curves.'
     ];
@@ -234,42 +234,42 @@ async function main() {
     problemPoints.forEach((p, idx) => {
       // Small custom red bullet icon
       slide.addShape('rect', {
-        x: 1.1,
-        y: 2.3 + idx * 1.3,
-        w: 0.1,
-        h: 0.1,
+        x: 1.0,
+        y: 1.95 + idx * 0.95,
+        w: 0.08,
+        h: 0.08,
         fill: { color: COLORS.RED_TEXT },
         line: { width: 0 }
       });
       
       slide.addText(p, {
-        x: 1.3,
-        y: 2.2 + idx * 1.3,
-        w: 4.8,
-        h: 1.1,
+        x: 1.15,
+        y: 1.85 + idx * 0.95,
+        w: 3.45,
+        h: 0.85,
         fontFace: 'Segoe UI',
-        fontSize: 13,
+        fontSize: 10.5,
         color: COLORS.TEXT
       });
     });
 
     // Right column: Solution
     slide.addShape('rect', {
-      x: 6.9,
-      y: 1.5,
-      w: 5.6,
-      h: 5.0,
+      x: 5.2,
+      y: 1.3,
+      w: 4.0,
+      h: 3.6,
       fill: { color: COLORS.GREEN_BG },
       line: { color: COLORS.GREEN_BORDER, width: 1 }
     });
 
     slide.addText('OUR PURPOSE-BUILT SOLUTION', {
-      x: 7.2,
-      y: 1.7,
-      w: 5.0,
-      h: 0.4,
+      x: 5.4,
+      y: 1.45,
+      w: 3.6,
+      h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 18,
+      fontSize: 14,
       color: COLORS.GREEN_TEXT,
       bold: true
     });
@@ -283,21 +283,21 @@ async function main() {
     solutionPoints.forEach((p, idx) => {
       // Small custom green bullet icon
       slide.addShape('rect', {
-        x: 7.2,
-        y: 2.3 + idx * 1.3,
-        w: 0.1,
-        h: 0.1,
+        x: 5.4,
+        y: 1.95 + idx * 0.95,
+        w: 0.08,
+        h: 0.08,
         fill: { color: COLORS.GREEN_TEXT },
         line: { width: 0 }
       });
 
       slide.addText(p, {
-        x: 7.4,
-        y: 2.2 + idx * 1.3,
-        w: 4.8,
-        h: 1.1,
+        x: 5.55,
+        y: 1.85 + idx * 0.95,
+        w: 3.45,
+        h: 0.85,
         fontFace: 'Segoe UI',
-        fontSize: 13,
+        fontSize: 10.5,
         color: COLORS.TEXT
       });
     });
@@ -312,7 +312,7 @@ async function main() {
     const steps = [
       {
         num: '1',
-        title: 'DNS & Edge Caching',
+        title: 'DNS & Edge',
         desc: 'Namecheap DNS routes apex and www requests. CloudFront CDN serves cached static assets globally at 400+ Edge locations, reducing latency.'
       },
       {
@@ -332,11 +332,11 @@ async function main() {
       }
     ];
 
-    const cardW = 2.65;
-    const cardH = 4.2;
-    const cardY = 1.6;
-    const gap = 0.25;
-    const startX = 0.8;
+    const cardW = 1.9;
+    const cardH = 3.5;
+    const cardY = 1.4;
+    const gap = 0.2;
+    const startX = (10.0 - (4 * cardW + 3 * gap)) / 2;
 
     steps.forEach((s, idx) => {
       const x = startX + idx * (cardW + gap);
@@ -353,21 +353,21 @@ async function main() {
       
       // Number bubble
       slide.addShape('oval', {
-        x: x + 1.1,
-        y: cardY + 0.3,
-        w: 0.45,
-        h: 0.45,
+        x: x + 0.75,
+        y: cardY + 0.2,
+        w: 0.4,
+        h: 0.4,
         fill: { color: COLORS.NAVY },
         line: { width: 0 }
       });
       
       slide.addText(s.num, {
-        x: x + 1.1,
-        y: cardY + 0.35,
-        w: 0.45,
-        h: 0.4,
+        x: x + 0.75,
+        y: cardY + 0.23,
+        w: 0.4,
+        h: 0.3,
         fontFace: 'Segoe UI',
-        fontSize: 16,
+        fontSize: 12,
         color: COLORS.WHITE,
         bold: true,
         align: 'center'
@@ -376,11 +376,11 @@ async function main() {
       // Card Title
       slide.addText(s.title, {
         x: x + 0.1,
-        y: cardY + 1.0,
+        y: cardY + 0.7,
         w: cardW - 0.2,
-        h: 0.5,
+        h: 0.4,
         fontFace: 'Segoe UI',
-        fontSize: 14,
+        fontSize: 11,
         color: COLORS.NAVY,
         bold: true,
         align: 'center'
@@ -388,23 +388,23 @@ async function main() {
       
       // Card Description
       slide.addText(s.desc, {
-        x: x + 0.15,
-        y: cardY + 1.6,
-        w: cardW - 0.3,
-        h: 2.3,
+        x: x + 0.1,
+        y: cardY + 1.2,
+        w: cardW - 0.2,
+        h: 2.1,
         fontFace: 'Segoe UI',
-        fontSize: 11,
+        fontSize: 9,
         color: COLORS.TEXT,
         align: 'center'
       });
 
       // Draw right arrow between cards
       if (idx < 3) {
-        const arrowX = x + cardW + 0.05;
+        const arrowX = x + cardW + 0.04;
         slide.addShape('rect', {
           x: arrowX,
-          y: cardY + 2.0,
-          w: 0.15,
+          y: cardY + 1.6,
+          w: 0.12,
           h: 0.02,
           fill: { color: COLORS.SKY },
           line: { width: 0 }
@@ -423,18 +423,18 @@ async function main() {
     if (fs.existsSync(imgPath)) {
       slide.addImage({
         path: imgPath,
-        x: 3.36,
-        y: 1.4,
-        w: 6.6,
-        h: 5.5
+        x: 2.78,
+        y: 1.3,
+        w: 4.44,
+        h: 3.7
       });
     } else {
       slide.addText('[Architecture Diagram Image Missing]', {
-        x: 3.36,
-        y: 3.0,
-        w: 6.6,
+        x: 2.78,
+        y: 2.5,
+        w: 4.44,
         h: 1.0,
-        fontSize: 16,
+        fontSize: 14,
         align: 'center',
         color: 'EF4444'
       });
@@ -482,12 +482,12 @@ async function main() {
       }
     ];
 
-    const cardW = 5.6;
-    const cardH = 2.4;
-    const gapX = 0.5;
-    const gapY = 0.3;
+    const cardW = 4.0;
+    const cardH = 1.7;
+    const gapX = 0.4;
+    const gapY = 0.2;
     const startX = 0.8;
-    const startY = 1.5;
+    const startY = 1.4;
 
     secCards.forEach((c, idx) => {
       const col = idx % 2;
@@ -507,12 +507,12 @@ async function main() {
 
       // Card Title
       slide.addText(c.title, {
-        x: x + 0.2,
-        y: y + 0.15,
-        w: cardW - 0.4,
-        h: 0.4,
+        x: x + 0.15,
+        y: y + 0.1,
+        w: cardW - 0.3,
+        h: 0.3,
         fontFace: 'Segoe UI',
-        fontSize: 14,
+        fontSize: 11,
         color: COLORS.NAVY,
         bold: true
       });
@@ -520,21 +520,21 @@ async function main() {
       // Bullet points
       c.points.forEach((p, pIdx) => {
         slide.addShape('rect', {
-          x: x + 0.3,
-          y: y + 0.7 + pIdx * 0.52,
-          w: 0.06,
-          h: 0.06,
+          x: x + 0.2,
+          y: y + 0.45 + pIdx * 0.4,
+          w: 0.05,
+          h: 0.05,
           fill: { color: COLORS.SKY },
           line: { width: 0 }
         });
 
         slide.addText(p, {
-          x: x + 0.45,
-          y: y + 0.6 + pIdx * 0.52,
-          w: cardW - 0.7,
-          h: 0.5,
+          x: x + 0.3,
+          y: y + 0.38 + pIdx * 0.4,
+          w: cardW - 0.45,
+          h: 0.38,
           fontFace: 'Segoe UI',
-          fontSize: 10.5,
+          fontSize: 8.5,
           color: COLORS.TEXT
         });
       });
@@ -550,11 +550,11 @@ async function main() {
     // Left Column: Flow
     slide.addText('DEPLOYMENT PIPELINE FLOW', {
       x: 0.8,
-      y: 1.5,
-      w: 5.6,
-      h: 0.4,
+      y: 1.3,
+      w: 4.0,
+      h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 16,
+      fontSize: 13,
       color: COLORS.NAVY,
       bold: true
     });
@@ -570,32 +570,32 @@ async function main() {
       // Step box
       slide.addShape('rect', {
         x: 0.8,
-        y: 2.0 + idx * 1.1,
-        w: 5.6,
-        h: 0.95,
+        y: 1.7 + idx * 0.8,
+        w: 4.0,
+        h: 0.7,
         fill: { color: COLORS.LIGHT_BG },
         line: { color: COLORS.BORDER, width: 1 }
       });
 
       slide.addText(s, {
-        x: 1.0,
-        y: 2.05 + idx * 1.1,
-        w: 5.2,
-        h: 0.85,
+        x: 0.9,
+        y: 1.72 + idx * 0.8,
+        w: 3.8,
+        h: 0.65,
         fontFace: 'Segoe UI',
-        fontSize: 11,
+        fontSize: 8.5,
         color: COLORS.TEXT
       });
     });
 
     // Right Column: Advantages
     slide.addText('PIPELINE ADVANTAGES & SECURITY', {
-      x: 6.9,
-      y: 1.5,
-      w: 5.6,
-      h: 0.4,
+      x: 5.2,
+      y: 1.3,
+      w: 4.0,
+      h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 16,
+      fontSize: 13,
       color: COLORS.NAVY,
       bold: true
     });
@@ -618,32 +618,32 @@ async function main() {
     advantages.forEach((a, idx) => {
       // Advantage card
       slide.addShape('rect', {
-        x: 6.9,
-        y: 2.0 + idx * 1.5,
-        w: 5.6,
-        h: 1.35,
+        x: 5.2,
+        y: 1.7 + idx * 1.05,
+        w: 4.0,
+        h: 0.95,
         fill: { color: COLORS.BLUE_LIGHT },
         line: { color: COLORS.SKY, width: 1 }
       });
 
       slide.addText(a.title, {
-        x: 7.1,
-        y: 2.05 + idx * 1.5,
-        w: 5.2,
-        h: 0.35,
+        x: 5.3,
+        y: 1.72 + idx * 1.05,
+        w: 3.8,
+        h: 0.25,
         fontFace: 'Segoe UI',
-        fontSize: 13,
+        fontSize: 10,
         color: COLORS.NAVY,
         bold: true
       });
 
       slide.addText(a.desc, {
-        x: 7.1,
-        y: 2.4 + idx * 1.5,
-        w: 5.2,
-        h: 0.9,
+        x: 5.3,
+        y: 1.95 + idx * 1.05,
+        w: 3.8,
+        h: 0.68,
         fontFace: 'Segoe UI',
-        fontSize: 10.5,
+        fontSize: 8.5,
         color: COLORS.TEXT
       });
     });
@@ -658,11 +658,11 @@ async function main() {
     // Left Column: Kanban Structure
     slide.addText('TRELLO KANBAN STRUCTURE', {
       x: 0.8,
-      y: 1.5,
-      w: 5.6,
-      h: 0.4,
+      y: 1.3,
+      w: 4.0,
+      h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 16,
+      fontSize: 13,
       color: COLORS.NAVY,
       bold: true
     });
@@ -677,20 +677,20 @@ async function main() {
     boardCols.forEach((bc, idx) => {
       slide.addShape('rect', {
         x: 0.8,
-        y: 2.0 + idx * 1.1,
-        w: 5.6,
-        h: 0.95,
+        y: 1.7 + idx * 0.8,
+        w: 4.0,
+        h: 0.7,
         fill: { color: COLORS.LIGHT_BG },
         line: { color: COLORS.BORDER, width: 1 }
       });
 
       slide.addText(`${bc.col}: ${bc.desc}`, {
-        x: 1.0,
-        y: 2.05 + idx * 1.1,
-        w: 5.2,
-        h: 0.85,
+        x: 0.9,
+        y: 1.72 + idx * 0.8,
+        w: 3.8,
+        h: 0.65,
         fontFace: 'Segoe UI',
-        fontSize: 11,
+        fontSize: 8.5,
         color: COLORS.TEXT,
         bold: true
       });
@@ -698,12 +698,12 @@ async function main() {
 
     // Right Column: Sprint Slices
     slide.addText('SPRINT PROGRESSION BY PHASE', {
-      x: 6.9,
-      y: 1.5,
-      w: 5.6,
-      h: 0.4,
+      x: 5.2,
+      y: 1.3,
+      w: 4.0,
+      h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 16,
+      fontSize: 13,
       color: COLORS.NAVY,
       bold: true
     });
@@ -717,32 +717,32 @@ async function main() {
 
     sprints.forEach((s, idx) => {
       slide.addShape('rect', {
-        x: 6.9,
-        y: 2.0 + idx * 1.1,
-        w: 5.6,
-        h: 0.95,
+        x: 5.2,
+        y: 1.7 + idx * 0.8,
+        w: 4.0,
+        h: 0.7,
         fill: { color: COLORS.BLUE_LIGHT },
         line: { color: COLORS.SKY, width: 1 }
       });
 
       slide.addText(s.title, {
-        x: 7.1,
-        y: 2.05 + idx * 1.1,
-        w: 5.2,
-        h: 0.3,
+        x: 5.3,
+        y: 1.72 + idx * 0.8,
+        w: 3.8,
+        h: 0.22,
         fontFace: 'Segoe UI',
-        fontSize: 11,
+        fontSize: 9,
         color: COLORS.NAVY,
         bold: true
       });
 
       slide.addText(s.desc, {
-        x: 7.1,
-        y: 2.35 + idx * 1.1,
-        w: 5.2,
-        h: 0.55,
+        x: 5.3,
+        y: 1.95 + idx * 0.8,
+        w: 3.8,
+        h: 0.43,
         fontFace: 'Segoe UI',
-        fontSize: 9.5,
+        fontSize: 8,
         color: COLORS.TEXT
       });
     });
@@ -758,18 +758,18 @@ async function main() {
     if (fs.existsSync(imgPath)) {
       slide.addImage({
         path: imgPath,
-        x: 1.66,
-        y: 1.5,
-        w: 10.0,
-        h: 5.0
+        x: 1.3,
+        y: 1.3,
+        w: 7.4,
+        h: 3.7
       });
     } else {
       slide.addText('[Trello Board Screenshot Image Missing]', {
-        x: 1.66,
-        y: 3.0,
-        w: 10.0,
+        x: 1.3,
+        y: 2.5,
+        w: 7.4,
         h: 1.0,
-        fontSize: 16,
+        fontSize: 14,
         align: 'center',
         color: 'EF4444'
       });
@@ -785,20 +785,20 @@ async function main() {
     // Live URL box
     slide.addShape('rect', {
       x: 0.8,
-      y: 1.5,
-      w: 11.73,
-      h: 1.0,
+      y: 1.3,
+      w: 8.4,
+      h: 0.8,
       fill: { color: COLORS.BLUE_LIGHT },
       line: { color: COLORS.SKY, width: 1 }
     });
 
     slide.addText('SECURE PRODUCTION DEPLOYMENT URL', {
       x: 0.8,
-      y: 1.6,
-      w: 11.73,
-      h: 0.25,
+      y: 1.35,
+      w: 8.4,
+      h: 0.2,
       fontFace: 'Segoe UI',
-      fontSize: 11,
+      fontSize: 9,
       color: COLORS.SKY,
       bold: true,
       align: 'center'
@@ -806,11 +806,11 @@ async function main() {
 
     slide.addText('https://www.studentstudyplannerxyz.xyz/', {
       x: 0.8,
-      y: 1.85,
-      w: 11.73,
-      h: 0.5,
+      y: 1.55,
+      w: 8.4,
+      h: 0.4,
       fontFace: 'Segoe UI',
-      fontSize: 24,
+      fontSize: 18,
       color: COLORS.NAVY,
       bold: true,
       align: 'center'
@@ -819,11 +819,11 @@ async function main() {
     // Left Column: Step-by-Step Live Demo script
     slide.addText('STEP-BY-STEP LIVE DEMO GUIDE', {
       x: 0.8,
-      y: 2.8,
-      w: 5.6,
-      h: 0.35,
+      y: 2.3,
+      w: 4.0,
+      h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 14,
+      fontSize: 12,
       color: COLORS.NAVY,
       bold: true
     });
@@ -839,96 +839,96 @@ async function main() {
     demoSteps.forEach((s, idx) => {
       slide.addShape('rect', {
         x: 0.8,
-        y: 3.25 + idx * 0.7,
-        w: 5.6,
-        h: 0.62,
+        y: 2.65 + idx * 0.48,
+        w: 4.0,
+        h: 0.42,
         fill: { color: COLORS.LIGHT_BG },
         line: { color: COLORS.BORDER, width: 1 }
       });
 
       slide.addText(s, {
-        x: 0.95,
-        y: 3.28 + idx * 0.7,
-        w: 5.3,
-        h: 0.55,
+        x: 0.9,
+        y: 2.67 + idx * 0.48,
+        w: 3.8,
+        h: 0.38,
         fontFace: 'Segoe UI',
-        fontSize: 10,
+        fontSize: 8,
         color: COLORS.TEXT
       });
     });
 
     // Right Column: Demo video & repository info
     slide.addText('DEMO RESOURCES & METRICS', {
-      x: 6.9,
-      y: 2.8,
-      w: 5.6,
-      h: 0.35,
+      x: 5.2,
+      y: 2.3,
+      w: 4.0,
+      h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 14,
+      fontSize: 12,
       color: COLORS.NAVY,
       bold: true
     });
 
     // Video card
     slide.addShape('rect', {
-      x: 6.9,
-      y: 3.25,
-      w: 5.6,
-      h: 1.6,
+      x: 5.2,
+      y: 2.65,
+      w: 4.0,
+      h: 1.1,
       fill: { color: COLORS.LIGHT_BG },
       line: { color: COLORS.BORDER, width: 1 }
     });
 
     slide.addText('🎥 DEMO RECORDING LINK', {
-      x: 7.1,
-      y: 3.35,
-      w: 5.2,
-      h: 0.3,
+      x: 5.35,
+      y: 2.7,
+      w: 3.7,
+      h: 0.2,
       fontFace: 'Segoe UI',
-      fontSize: 12,
+      fontSize: 10,
       color: COLORS.NAVY,
       bold: true
     });
 
     slide.addText('https://drive.google.com/file/d/1DXGpDX82FUIWEva6sP-sFRv0VPGFDekr/view?usp=sharing', {
-      x: 7.1,
-      y: 3.7,
-      w: 5.2,
-      h: 1.0,
+      x: 5.35,
+      y: 2.9,
+      w: 3.7,
+      h: 0.8,
       fontFace: 'Segoe UI',
-      fontSize: 11,
+      fontSize: 8.5,
       color: COLORS.SKY,
       bold: true
     });
 
     // Tech Specs card
     slide.addShape('rect', {
-      x: 6.9,
-      y: 5.05,
-      w: 5.6,
-      h: 1.6,
+      x: 5.2,
+      y: 3.9,
+      w: 4.0,
+      h: 1.15,
       fill: { color: COLORS.LIGHT_BG },
       line: { color: COLORS.BORDER, width: 1 }
     });
 
     slide.addText('⚙️ PERFORMANCE SPECS', {
-      x: 7.1,
-      y: 5.15,
-      w: 5.2,
-      h: 0.3,
+      x: 5.35,
+      y: 3.95,
+      w: 3.7,
+      h: 0.2,
       fontFace: 'Segoe UI',
-      fontSize: 12,
+      fontSize: 10,
       color: COLORS.NAVY,
       bold: true
     });
 
     slide.addText('• Edge delivery: Served in under 50ms worldwide via CDN caching.\n• Failover capability: Auto-scales across availability zones automatically.\n• Scalability: ASG group configuration supports up to 300 active connections.', {
-      x: 7.1,
-      y: 5.5,
-      w: 5.2,
-      h: 1.05,
+      x: 5.35,
+      y: 4.2,
+      w: 3.7,
+      h: 0.82,
       fontFace: 'Segoe UI',
-      fontSize: 10.5,
+      fontSize: 8.5,
       color: COLORS.TEXT
     });
   }
@@ -966,12 +966,12 @@ async function main() {
       }
     ];
 
-    const cardW = 5.6;
-    const cardH = 2.4;
-    const gapX = 0.5;
-    const gapY = 0.3;
+    const cardW = 4.0;
+    const cardH = 1.7;
+    const gapX = 0.4;
+    const gapY = 0.2;
     const startX = 0.8;
-    const startY = 1.5;
+    const startY = 1.4;
 
     challengesPart1.forEach((c, idx) => {
       const col = idx % 2;
@@ -992,20 +992,20 @@ async function main() {
       // Number Bubble
       slide.addShape('oval', {
         x: x + 0.15,
-        y: y + 0.15,
-        w: 0.3,
-        h: 0.3,
+        y: y + 0.1,
+        w: 0.25,
+        h: 0.25,
         fill: { color: COLORS.RED_TEXT },
         line: { width: 0 }
       });
 
       slide.addText(c.id, {
         x: x + 0.15,
-        y: y + 0.17,
-        w: 0.3,
-        h: 0.25,
+        y: y + 0.11,
+        w: 0.25,
+        h: 0.2,
         fontFace: 'Segoe UI',
-        fontSize: 10,
+        fontSize: 8.5,
         color: COLORS.WHITE,
         bold: true,
         align: 'center'
@@ -1013,34 +1013,34 @@ async function main() {
 
       // Title
       slide.addText(c.title, {
-        x: x + 0.55,
-        y: y + 0.12,
-        w: cardW - 0.7,
-        h: 0.35,
+        x: x + 0.45,
+        y: y + 0.08,
+        w: cardW - 0.6,
+        h: 0.3,
         fontFace: 'Segoe UI',
-        fontSize: 12,
+        fontSize: 9.5,
         color: COLORS.RED_TEXT,
         bold: true
       });
 
       // Cause and Resolution
       slide.addText(`Root Cause: ${c.cause}`, {
-        x: x + 0.2,
-        y: y + 0.5,
-        w: cardW - 0.4,
-        h: 0.85,
+        x: x + 0.15,
+        y: y + 0.38,
+        w: cardW - 0.3,
+        h: 0.6,
         fontFace: 'Segoe UI',
-        fontSize: 9.5,
+        fontSize: 8,
         color: COLORS.TEXT
       });
 
       slide.addText(`Resolution: ${c.res}`, {
-        x: x + 0.2,
-        y: y + 1.45,
-        w: cardW - 0.4,
-        h: 0.85,
+        x: x + 0.15,
+        y: y + 1.05,
+        w: cardW - 0.3,
+        h: 0.6,
         fontFace: 'Segoe UI',
-        fontSize: 9.5,
+        fontSize: 8,
         color: COLORS.GREEN_TEXT,
         bold: true
       });
@@ -1074,11 +1074,11 @@ async function main() {
       }
     ];
 
-    const cardW = 3.65;
-    const cardH = 5.0;
-    const gap = 0.4;
-    const startX = 0.8;
-    const startY = 1.5;
+    const cardW = 2.65;
+    const cardH = 3.5;
+    const gap = 0.22;
+    const startX = (10.0 - (3 * cardW + 2 * gap)) / 2;
+    const startY = 1.4;
 
     challengesPart2.forEach((c, idx) => {
       const x = startX + idx * (cardW + gap);
@@ -1098,19 +1098,19 @@ async function main() {
       slide.addShape('oval', {
         x: x + 0.15,
         y: y + 0.15,
-        w: 0.35,
-        h: 0.35,
+        w: 0.28,
+        h: 0.28,
         fill: { color: COLORS.RED_TEXT },
         line: { width: 0 }
       });
 
       slide.addText(c.id, {
         x: x + 0.15,
-        y: y + 0.18,
-        w: 0.35,
-        h: 0.3,
+        y: y + 0.17,
+        w: 0.28,
+        h: 0.25,
         fontFace: 'Segoe UI',
-        fontSize: 11,
+        fontSize: 8.5,
         color: COLORS.WHITE,
         bold: true,
         align: 'center'
@@ -1118,34 +1118,34 @@ async function main() {
 
       // Title
       slide.addText(c.title, {
-        x: x + 0.6,
+        x: x + 0.5,
         y: y + 0.12,
-        w: cardW - 0.8,
-        h: 0.5,
+        w: cardW - 0.6,
+        h: 0.38,
         fontFace: 'Segoe UI',
-        fontSize: 12,
+        fontSize: 9.5,
         color: COLORS.RED_TEXT,
         bold: true
       });
 
       // Cause and Resolution
       slide.addText(`Root Cause:\n${c.cause}`, {
-        x: x + 0.2,
-        y: y + 0.7,
-        w: cardW - 0.4,
-        h: 2.0,
+        x: x + 0.15,
+        y: y + 0.6,
+        w: cardW - 0.3,
+        h: 1.3,
         fontFace: 'Segoe UI',
-        fontSize: 10,
+        fontSize: 8.5,
         color: COLORS.TEXT
       });
 
       slide.addText(`Resolution:\n${c.res}`, {
-        x: x + 0.2,
-        y: y + 2.8,
-        w: cardW - 0.4,
-        h: 2.0,
+        x: x + 0.15,
+        y: y + 2.0,
+        w: cardW - 0.3,
+        h: 1.3,
         fontFace: 'Segoe UI',
-        fontSize: 10,
+        fontSize: 8.5,
         color: COLORS.GREEN_TEXT,
         bold: true
       });
@@ -1161,20 +1161,20 @@ async function main() {
     // Left column: What Worked Well
     slide.addShape('rect', {
       x: 0.8,
-      y: 1.5,
-      w: 5.6,
-      h: 5.0,
+      y: 1.3,
+      w: 4.0,
+      h: 3.6,
       fill: { color: COLORS.BLUE_LIGHT },
       line: { color: COLORS.SKY, width: 1 }
     });
 
     slide.addText('WHAT WORKED WELL', {
-      x: 1.1,
-      y: 1.7,
-      w: 5.0,
-      h: 0.4,
+      x: 1.0,
+      y: 1.45,
+      w: 3.6,
+      h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 18,
+      fontSize: 14,
       color: COLORS.NAVY,
       bold: true
     });
@@ -1187,42 +1187,42 @@ async function main() {
 
     workedPoints.forEach((p, idx) => {
       slide.addShape('rect', {
-        x: 1.1,
-        y: 2.3 + idx * 1.5,
-        w: 0.1,
-        h: 0.1,
+        x: 1.0,
+        y: 1.95 + idx * 1.0,
+        w: 0.08,
+        h: 0.08,
         fill: { color: COLORS.NAVY },
         line: { width: 0 }
       });
 
       slide.addText(p, {
-        x: 1.3,
-        y: 2.2 + idx * 1.5,
-        w: 4.8,
-        h: 1.3,
+        x: 1.15,
+        y: 1.85 + idx * 1.0,
+        w: 3.45,
+        h: 0.95,
         fontFace: 'Segoe UI',
-        fontSize: 12.5,
+        fontSize: 10,
         color: COLORS.TEXT
       });
     });
 
     // Right column: What We'd Do Differently
     slide.addShape('rect', {
-      x: 6.9,
-      y: 1.5,
-      w: 5.6,
-      h: 5.0,
+      x: 5.2,
+      y: 1.3,
+      w: 4.0,
+      h: 3.6,
       fill: { color: COLORS.LIGHT_BG },
       line: { color: COLORS.BORDER, width: 1 }
     });
 
     slide.addText('WHAT WE WOULD DO DIFFERENTLY', {
-      x: 7.2,
-      y: 1.7,
-      w: 5.0,
-      h: 0.4,
+      x: 5.4,
+      y: 1.45,
+      w: 3.6,
+      h: 0.3,
       fontFace: 'Segoe UI',
-      fontSize: 18,
+      fontSize: 14,
       color: COLORS.NAVY,
       bold: true
     });
@@ -1235,21 +1235,21 @@ async function main() {
 
     diffPoints.forEach((p, idx) => {
       slide.addShape('rect', {
-        x: 7.2,
-        y: 2.3 + idx * 1.5,
-        w: 0.1,
-        h: 0.1,
+        x: 5.4,
+        y: 1.95 + idx * 1.0,
+        w: 0.08,
+        h: 0.08,
         fill: { color: COLORS.SKY },
         line: { width: 0 }
       });
 
       slide.addText(p, {
-        x: 7.4,
-        y: 2.2 + idx * 1.5,
-        w: 4.8,
-        h: 1.3,
+        x: 5.55,
+        y: 1.85 + idx * 1.0,
+        w: 3.45,
+        h: 0.95,
         fontFace: 'Segoe UI',
-        fontSize: 12.5,
+        fontSize: 10,
         color: COLORS.TEXT
       });
     });
@@ -1263,57 +1263,57 @@ async function main() {
     slide.background = { color: COLORS.SLATE_DARK };
 
     slide.addText('THANK YOU!', {
-      x: 1.0,
-      y: 2.0,
-      w: 11.33,
-      h: 1.0,
+      x: 0.5,
+      y: 1.5,
+      w: 9.0,
+      h: 0.8,
       fontFace: 'Segoe UI',
-      fontSize: 44,
+      fontSize: 36,
       color: COLORS.SKY,
       bold: true,
       align: 'center'
     });
 
     slide.addText('Questions & Discussion', {
-      x: 1.0,
-      y: 3.0,
-      w: 11.33,
-      h: 0.6,
+      x: 0.5,
+      y: 2.3,
+      w: 9.0,
+      h: 0.5,
       fontFace: 'Segoe UI',
-      fontSize: 20,
+      fontSize: 18,
       color: COLORS.WHITE,
       align: 'center'
     });
 
     // Repository & App Links Box
     slide.addShape('rect', {
-      x: 3.66,
-      y: 4.2,
-      w: 6.0,
-      h: 1.8,
+      x: 2.5,
+      y: 3.1,
+      w: 5.0,
+      h: 1.5,
       fill: { color: COLORS.SLATE_CARD },
       line: { color: '334155', width: 1 }
     });
 
     slide.addText('PROJECT RESOURCES', {
-      x: 3.66,
-      y: 4.3,
-      w: 6.0,
-      h: 0.3,
+      x: 2.5,
+      y: 3.2,
+      w: 5.0,
+      h: 0.25,
       fontFace: 'Segoe UI',
-      fontSize: 11,
+      fontSize: 10,
       color: COLORS.SKY,
       bold: true,
       align: 'center'
     });
 
     slide.addText('GitHub Repository:\nhttps://github.com/GeekKwame/aws-capstone-project\n\nLive Deployment URL:\nhttps://www.studentstudyplannerxyz.xyz/', {
-      x: 3.86,
-      y: 4.65,
-      w: 5.6,
-      h: 1.2,
+      x: 2.7,
+      y: 3.5,
+      w: 4.6,
+      h: 1.0,
       fontFace: 'Segoe UI',
-      fontSize: 11,
+      fontSize: 9.5,
       color: COLORS.WHITE,
       align: 'center'
     });
