@@ -1,7 +1,8 @@
 {
   "devDependencies": {
     "html-to-docx": "^1.8.0",
-    "marked": "^18.0.5"
+    "marked": "^18.0.5",
+    "pptxgenjs": "^4.0.1"
   },
   "dependencies": {
     "docx": "^9.7.1",
