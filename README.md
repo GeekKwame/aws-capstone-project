@@ -149,7 +149,8 @@ aws-capstone-project/
 ├── nginx/
 │   └── study-planner.conf # Nginx configuration template for EC2
 ├── scripts/
-│   └── generate_phase2_docx.js # Documentation compiler script
+│   ├── deploy-ec2.sh           # EC2 deploy + CloudFront invalidation
+│   └── generate_final_report.js # Final capstone DOCX generator
 └── README.md             # This file
 ```
 
@@ -171,6 +172,10 @@ aws-capstone-project/
 
 All five phases are documented and the application is live at [https://www.studentstudyplannerxyz.xyz/](https://www.studentstudyplannerxyz.xyz/).
 
+**Final submission document:** [docs/CAPSTONE_FINAL_REPORT.docx](docs/CAPSTONE_FINAL_REPORT.docx) — consolidated report covering Phases 1–5 with selected screenshots, architecture overview, and project links.
+
+**Demo video:** [Google Drive recording](https://drive.google.com/file/d/1DXGpDX82FUIWEva6sP-sFRv0VPGFDekr/view?usp=sharing)
+
 ---
 
-*Last updated: June 11, 2026 — All phases complete. Website live at [https://www.studentstudyplannerxyz.xyz/](https://www.studentstudyplannerxyz.xyz/)*
+*Last updated: June 12, 2026 — All phases complete. Final report submitted.*
