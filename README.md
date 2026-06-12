@@ -1,6 +1,6 @@
 # Student Study Planner — AWS Capstone Project
 
-**Student Study Planner** (deployed as **MyCloudApp**) is an interactive, responsive web application designed to help students organize academic workflows, manage schedules, and stay productive. It provides comprehensive task tracking (CRUD), session categorization, local progress state persistence, and interactive motivation features.
+**Student Study Planner** is an interactive, responsive web application designed to help students organize academic workflows, manage schedules, and stay productive. It provides comprehensive task tracking (CRUD), session categorization, local progress state persistence, and interactive motivation features.
 
 This repository documents the full design, provisioning, deployment, and security hardening of the application's production infrastructure on AWS. The system utilizes a load-balanced, auto-scaling architecture fronted by a global content delivery network (CDN).
 
